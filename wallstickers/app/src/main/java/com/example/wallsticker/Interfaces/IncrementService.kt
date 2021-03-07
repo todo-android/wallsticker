@@ -15,7 +15,7 @@ interface IncrementServiceQuote {
     @PUT("incShareQuote/{id}")
     fun incrementShare(
         @Path("id") id: Int?,
-        @Field("count_shared") count_shared: Int?,
+        @Field("count_shared") count_shared: Int?
     )
             : Call<Any>
 
@@ -36,7 +36,7 @@ interface IncrementViewQuote {
     @PUT("incViewQuote/{id}")
     fun incrementViews(
         @Path("id") id: Int?,
-        @Field("count_views") count_views: Int?,
+        @Field("count_views") count_views: Int?
     )
             : Call<Any>
 

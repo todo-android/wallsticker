@@ -4,79 +4,142 @@ import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.widget.Toast
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
-import com.example.wallsticker.Model.category
-import com.example.wallsticker.Model.image
+import com.example.wallsticker.Model.Images
+import com.example.wallsticker.Model.Categories
 import com.example.wallsticker.Repository.ImagesRepo
 import com.example.wallsticker.Utilities.NetworkResults
-import com.example.wallsticker.data.databsae.ImageEntity
+import com.example.wallsticker.data.databsae.entities.CategoryEntity
+import com.example.wallsticker.data.databsae.entities.FavoritesEntity
+import com.example.wallsticker.data.databsae.entities.ImageEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Response
-import javax.inject.Inject
 
 class ImagesViewModel @ViewModelInject constructor(
-    private val imageRepo: ImagesRepo, application: Application
+    private val imageRepo: ImagesRepo,
+    application: Application
 ) : AndroidViewModel(application) {
+
     /**ROOM DATABASE**/
     val readImages: LiveData<List<ImageEntity>> = imageRepo.local.readdatabase().asLiveData()
+    val readFavorite: LiveData<List<FavoritesEntity>> = imageRepo.local.readFavorite().asLiveData()
+    val readCategories :LiveData<List<CategoryEntity>> = imageRepo.local.readCategories().asLiveData()
+
 
     private fun insert(imageEntity: ImageEntity) =
         viewModelScope.launch(Dispatchers.IO) {
             imageRepo.local.insertImage(imageEntity)
         }
 
+    private fun insertCategories(categoryEntity: CategoryEntity)=
+        viewModelScope.launch (Dispatchers.IO){
+            imageRepo.local.insertCategories(categoryEntity)
+        }
+
+    fun insertFavorite(favoritesEntity: FavoritesEntity) =
+        viewModelScope.launch(Dispatchers.IO) {
+            imageRepo.local.insertFavorite(favoritesEntity)
+        }
+
+    fun deleteFavorite(favoritesEntity: FavoritesEntity) =
+        viewModelScope.launch(Dispatchers.IO) {
+            imageRepo.local.deleteFavorite(favoritesEntity)
+        }
+
     /** RETROFIT **/
-    var imagesCategories: MutableLiveData<Response<List<category>>> = MutableLiveData()
-    var images: MutableLiveData<NetworkResults<List<image>>> = MutableLiveData()
+    var categories: MutableLiveData<NetworkResults<Categories>> = MutableLiveData()
+    var imagesData: MutableLiveData<NetworkResults<Images>> = MutableLiveData()
 
     fun getImagesCategories() {
-        viewModelScope.launch {
+            viewModelScope.launch {
+                getCategoriesSafeCall()
+            }
+    }
 
-            val categoreisRespo = imageRepo.getImagescategories()
-            imagesCategories.value = categoreisRespo
+    private suspend fun getCategoriesSafeCall() {
+        if  (readCategories.value.isNullOrEmpty()){
+            if (hasInternetConnection()) {
+                try {
+                    val categoriesResponse = imageRepo.remot.getCategories()
+                    categories.value = handCategoriesResponse(categoriesResponse)
+
+                } catch (ex: Exception) {
+                    imagesData.value = NetworkResults.Error(ex.message)
+                }
+            } else {
+                imagesData.value = NetworkResults.Error("No Internet Connection")
+            }
+        }
+        //categories.value=NetworkResults.Loading()
+
+
+    }
+
+
+
+    private fun handCategoriesResponse(categoriesResponse: Response<Categories>): NetworkResults<Categories>? {
+        when {
+            categoriesResponse.message().toString()
+                .contains("Timeout") -> return NetworkResults.Error("Timeout")
+            categoriesResponse.code() == 402 -> return NetworkResults.Error("Api Key Limited.")
+            categoriesResponse.body()!!.results.isNullOrEmpty() -> return NetworkResults.Error("No Data Found")
+            categoriesResponse.isSuccessful -> {
+                val categories = categoriesResponse.body()
+                val categoryEntity = categories?.let { CategoryEntity(0, it) }
+                insertCategories(categoryEntity!!)
+                return NetworkResults.Success(categories!!)
+            }
+            else -> return NetworkResults.Error(categoriesResponse.message())
         }
     }
 
 
-    fun getImages(offset: Int, id: Int?) {
+    fun getImages() {
         viewModelScope.launch {
-            getImagesSafeCall(offset, id)
-
+            getImagesSafeCall()
         }
     }
 
-    private suspend fun getImagesSafeCall(offset: Int, id: Int?) {
-        images.value = NetworkResults.Loading()
+    private suspend fun getImagesSafeCall() {
+        imagesData.value = NetworkResults.Loading()
         if (hasInternetConnection()) {
             try {
-                val imagesResponse = imageRepo.remot.getImages(offset, id)
-                images.value = handlImagesResponse(imagesResponse)
+                val imagesResponse = imageRepo.remot.getImages()
+                imagesData.value = handlImagesResponse(imagesResponse)
 
-                val imageCache = images.value!!.data
+                val imageCache = imagesData.value!!.data
                 if (imageCache != null) {
-                   // offlineCacheImages(imageCache)
+                    offlineCacheImages(imageCache)
                 }
             } catch (ex: Exception) {
-                images.value = NetworkResults.Error(ex.message)
+                imagesData.value = NetworkResults.Error(ex.message)
             }
 
         } else {
-            images.value = NetworkResults.Error("No Internet Connection")
+            imagesData.value = NetworkResults.Error("No Internet Connection")
         }
     }
 
-    private fun offlineCacheImages(imageCache: image) {
-       // val imageEntity:ImageEntity(imageCache)
+    private fun offlineCacheImages(images: Images) {
+        val imageEntity=ImageEntity(images)
+        insertRecipes(imageEntity)
+
     }
 
-    private fun handlImagesResponse(imagesResponse: Response<List<image>>): NetworkResults<List<image>>? {
+    private fun insertRecipes(imageEntity: ImageEntity) =
+        viewModelScope.launch(Dispatchers.IO) {
+            imageRepo.local.insertImage(imageEntity)
+        }
+
+    private fun handlImagesResponse(imagesResponse: Response<Images>): NetworkResults<Images>? {
         when {
             imagesResponse.message().toString()
                 .contains("Timeout") -> return NetworkResults.Error("Timeout")
             imagesResponse.code() == 402 -> return NetworkResults.Error("Api KEy Limited.")
-            imagesResponse.body().isNullOrEmpty() -> return NetworkResults.Error("No Data Found")
+            imagesResponse.body()!!.results.isNullOrEmpty() -> return NetworkResults.Error("No Data Found")
             imagesResponse.isSuccessful -> {
                 val images = imagesResponse.body()
                 return NetworkResults.Success(images!!)

@@ -8,13 +8,14 @@ import android.widget.ImageView
 import android.widget.Switch
 import android.widget.TextView
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.wallsticker.ViewModel.MainViewModel
-import com.example.wallsticker.Model.quote
+import com.example.wallsticker.Model.Quote
 import com.example.wallsticker.R
+import com.example.wallsticker.Repository.ImagesRepo
 import com.example.wallsticker.Repository.QuotesRepo
 import com.example.wallsticker.Utilities.Const
 import com.example.wallsticker.Utilities.InternetCheck
@@ -33,8 +34,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     var firstcheck :Boolean= false
     private lateinit var internetCheck: InternetCheck
 
-    private lateinit var mainViewModel: MainViewModel
+    private  val mainViewModel: MainViewModel by viewModels()
     private lateinit var viewmodelQuotes: QuotesViewModel
+    private lateinit var repository: ImagesRepo
 
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -47,15 +49,15 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         initView(view)
         viewmodelQuotes= ViewModelProvider(this,viewModelFactory).get(QuotesViewModel::class.java)
-        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        //mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
-        if (Const.QuotesTemp.size<=0 )
-        viewmodelQuotes.getLatestQuotes(0,null)
-
-
+        //if (Const.QuotesTemp.size<=0 )
+        //viewmodelQuotes.getLatestQuotes(0,null)
 
 
-        mainViewModel.readFromDataStore.observe(viewLifecycleOwner, { MODE ->
+
+
+       /* mainViewModel.readFromDataStore.observe(viewLifecycleOwner, { MODE ->
             when (MODE) {
                 "NO" -> {
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
@@ -69,15 +71,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
                 }
             }
-        })
-        viewmodelQuotes.latestquotes.observe(viewLifecycleOwner,{quotes->
-            if (quotes.isSuccessful){
-                quotes.body()?.let {
-                    Const.QuotesTemp.addAll(it)
-                    setRandomQuote()
-                }
-            }
-        })
+        })*/
 
 
         btn_Images.setOnClickListener {
@@ -145,12 +139,12 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         if (Const.QuotesTemp.size <= 0) {
         } else {
             var rnds: Int = (0..Const.QuotesTemp.size - 1).random()
-            if (Const.QuotesTemp[rnds] is quote) {
-                val quoteString: quote = Const.QuotesTemp[rnds] as quote
+            if (Const.QuotesTemp[rnds] is Quote) {
+                val quoteString: Quote = Const.QuotesTemp[rnds] as Quote
                 todyaQuote.text = quoteString.quote
             } else {
                 rnds--
-                val quoteString: quote = Const.QuotesTemp[rnds] as quote
+                val quoteString: Quote = Const.QuotesTemp[rnds] as Quote
                 todyaQuote.text = quoteString.quote
             }
         }

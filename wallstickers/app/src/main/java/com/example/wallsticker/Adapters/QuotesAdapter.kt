@@ -10,7 +10,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wallsticker.Interfaces.QuoteClickListener
-import com.example.wallsticker.Model.quote
+import com.example.wallsticker.Model.Quote
 import com.example.wallsticker.R
 import com.example.wallsticker.Utilities.AdItem_Fb
 import com.facebook.ads.AdOptionsView
@@ -69,7 +69,7 @@ class QuotesAdapter(
             return
         val element = quotes[position]
         when (holder) {
-            is QuoteViewHolder -> holder.bind(element as quote, position)
+            is QuoteViewHolder -> holder.bind(element as Quote, position)
             is AdViewHolder -> holder.bind(element as AdItem_Fb, position)
             else -> throw IllegalArgumentException()
         }
@@ -105,7 +105,7 @@ class QuotesAdapter(
     override fun getItemViewType(position: Int): Int {
 
         return when (quotes[position]) {
-            is quote -> TYPE_QUOTE
+            is Quote -> TYPE_QUOTE
             is AdItem_Fb -> TYPE_AD
             else -> throw IllegalArgumentException("Invalid type of data " + position)
         }
@@ -120,7 +120,7 @@ class QuotesAdapter(
     }
 
 
-    inner class QuoteViewHolder(quoteView: View) : BaseViewHolder<quote>(quoteView) {
+    inner class QuoteViewHolder(quoteView: View) : BaseViewHolder<Quote>(quoteView) {
         var holder = quoteView
 
 
@@ -146,7 +146,7 @@ class QuotesAdapter(
 //            }
 //
 //        }
-        override fun bind(item: quote, position: Int) {
+        override fun bind(item: Quote, position: Int) {
             holder.txt_quote.text = item.quote
             holder.animation =
                 AnimationUtils.loadAnimation(

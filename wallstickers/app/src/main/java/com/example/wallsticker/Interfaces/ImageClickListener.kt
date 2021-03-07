@@ -1,12 +1,12 @@
 package com.example.wallsticker.Interfaces
 
 import android.view.View
-import com.example.wallsticker.Model.category
-import com.example.wallsticker.Model.image
+import com.example.wallsticker.Model.Category
+import com.example.wallsticker.Model.Image
 
 interface ImageClickListener {
 
-    fun onImageClicked(view: View, image: image, pos: Int)
-    fun onCatClicked(view: View, category: category, pos: Int)
+    fun onImageClicked(view: View, Image: Image, pos: Int)
+    fun onCatClicked(view: View, category: Category, pos: Int)
 
 }

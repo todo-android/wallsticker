@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.Glide
-import com.example.wallsticker.Model.image
+import com.example.wallsticker.Model.Image
 import com.example.wallsticker.R
 import com.example.wallsticker.Utilities.Const
 import kotlinx.android.synthetic.main.item_img_slider.view.*
@@ -16,7 +16,7 @@ class ImagesSliderAdapter(private val context: Context) : PagerAdapter() {
 
     var arrayOf = Const.arrayOf
     private var inflater: LayoutInflater? = null
-    var images: ArrayList<image> =
+    var Images: ArrayList<Image> =
         if (arrayOf == "latest") Const.ImagesTemp
         else if (arrayOf == "byCat") Const.ImagesByCatTemp
         else Const.ImageTempFav
@@ -28,7 +28,7 @@ class ImagesSliderAdapter(private val context: Context) : PagerAdapter() {
 
     override fun getCount(): Int {
 
-        return images.size
+        return Images.size
     }
 
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
@@ -39,7 +39,7 @@ class ImagesSliderAdapter(private val context: Context) : PagerAdapter() {
         //view.imgSliders.text=images[position]
         view.tag = "V$position"
         Glide.with(view.context)
-            .load(Const.directoryUpload + images[position].image_upload)
+            .load(Const.directoryUpload + Images[position].image_upload)
             .placeholder(R.drawable.placeholder)
             .into(view.imgSliders)
 

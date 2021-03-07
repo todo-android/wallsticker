@@ -5,21 +5,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.wallsticker.Interfaces.ImageClickListener
-import com.example.wallsticker.Model.image
+import com.example.wallsticker.Model.Image
+import com.example.wallsticker.Model.Images
 import com.example.wallsticker.R
 import com.example.wallsticker.Utilities.Const
+import com.example.wallsticker.Utilities.ImagesDiffUtil
 import kotlinx.android.synthetic.main.item_image.view.*
 
 class ImagesAdapter(
     private val imageClickListerner: ImageClickListener,
-    private val Images: List<image>,
-    private val context: Context?
+    private val context: Context?,
+    private val Images : ArrayList<Image>,
 ) : RecyclerView.Adapter<ImagesAdapter.MyViewHolder>() {
 
-
+    //private var Images = emptyList<Image>()
     class MyViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
 
@@ -62,5 +65,15 @@ class ImagesAdapter(
 
     // Return the size of your dataset (invoked by the layout manager)
     override fun getItemCount() = Images.size
+
+
+    fun setData(newData: Images){
+       /* val recipesDiffUtil =
+            ImagesDiffUtil(Images, newData.results)
+        val diffUtilResult = DiffUtil.calculateDiff(recipesDiffUtil)
+        Images = newData.results
+        diffUtilResult.dispatchUpdatesTo(this)*/
+
+    }
 
 }

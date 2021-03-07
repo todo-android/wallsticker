@@ -15,18 +15,24 @@ import android.provider.BaseColumns
 import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager.widget.ViewPager
 import com.example.wallsticker.Adapters.ImagesSliderAdapter
-import com.example.wallsticker.Model.image
+import com.example.wallsticker.Model.Image
 import com.example.wallsticker.R
 import com.example.wallsticker.Utilities.Const
 import com.example.wallsticker.Utilities.FeedReaderContract
 import com.example.wallsticker.Utilities.ShareTask
 import com.example.wallsticker.Utilities.helper
+import com.example.wallsticker.ViewModel.ImagesViewModel
+import com.example.wallsticker.ViewModel.MainViewModel
+import com.example.wallsticker.data.databsae.entities.FavoritesEntity
 import java.io.File
 
 
@@ -38,24 +44,29 @@ class ImgSlider : Fragment(R.layout.fragment_img_slider) {
     private lateinit var btnSharewtsp: ImageView
     private lateinit var btnFav: ImageView
     private lateinit var btndownload: ImageView
-    private lateinit var image: image
+    private lateinit var image: Image
     private var imagePosition: Int? = null
     private lateinit var viewpager: ViewPager
-    val projection = arrayOf(BaseColumns._ID, FeedReaderContract.FeedEntry.COLUMN_NAME_QUOTE)
+    private lateinit var imagesViewMode: ImagesViewModel
+
+    //private val mainViewModel: ImagesViewModel by  viewModels()
     var arrayOf = Const.arrayOf
     var msg: String? = ""
     var lastMsg = ""
 
-    var images: ArrayList<image> =
+    var Images: ArrayList<Image> =
         if (arrayOf == "latest") Const.ImagesTemp
         else if (arrayOf == "byCat") Const.ImagesByCatTemp
         else Const.ImageTempFav
 
+    var savedImageId=0
+
     @Override
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        image = images[args.position]
+        imagesViewMode = ViewModelProvider(requireActivity()).get(ImagesViewModel::class.java)
+        image = Images[args.position]
+        savedImageId=image.image_id
         imagePosition = args.position
         initView(view)
 
@@ -63,9 +74,13 @@ class ImgSlider : Fragment(R.layout.fragment_img_slider) {
         viewpager.adapter = adapter
         viewpager.currentItem = args.position
 
+
+
         if (image.isfav == 1)
             btnFav.setImageDrawable(context?.getDrawable(R.drawable.ic_is_fav))
         else btnFav.setImageDrawable(context?.getDrawable(R.drawable.ic_baseline_favorite_border_24))
+
+        Toast.makeText(context,image.cat_id.toString(),Toast.LENGTH_LONG).show()
 
 
         viewpager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
@@ -82,11 +97,13 @@ class ImgSlider : Fragment(R.layout.fragment_img_slider) {
 
             override fun onPageSelected(position: Int) {
 
-                image = images[position]
+                image = Images[position]
+                savedImageId=image.image_id
                 imagePosition = position
                 if (image.isfav == 1)
                     btnFav.setImageDrawable(context?.getDrawable(R.drawable.ic_is_fav))
                 else btnFav.setImageDrawable(context?.getDrawable(R.drawable.ic_baseline_favorite_border_24))
+                //Toast.makeText(context, image.image_id.toString(), Toast.LENGTH_LONG).show()
 
             }
         })
@@ -102,33 +119,24 @@ class ImgSlider : Fragment(R.layout.fragment_img_slider) {
         }
 
         btnFav.setOnClickListener {
-            val dbHelper = context?.let { helper(it) }
-            val db = dbHelper?.writableDatabase
-            if (image.isfav == null || image.isfav == 0) {
 
-                val values = ContentValues().apply {
-                    put(BaseColumns._ID, image.image_id)
-                    put(FeedReaderContract.FeedEntryImage.COLUMN_NAME_IMAGE, image.image_upload)
-                }
-                val newRowId =
-                    db!!.insert(FeedReaderContract.FeedEntryImage.TABLE_NAME, null, values)
-                images[imagePosition!!].isfav = 1
+            if (image.isfav == 0||image.isfav==null){
+                image.isfav=1
                 btnFav.setImageDrawable(context?.getDrawable(R.drawable.ic_is_fav))
-                Toast.makeText(context, newRowId.toString(), Toast.LENGTH_LONG).show()
+                val fav = FavoritesEntity(savedImageId, image)
+                imagesViewMode.insertFavorite(fav)
+                Toast.makeText(context, "added", Toast.LENGTH_LONG).show()
             } else {
-
-                val selection = "${BaseColumns._ID} like ?"
-                val selectionArgs = arrayOf(image.image_id.toString())
-                val deletedRows =
-                    db?.delete(
-                        FeedReaderContract.FeedEntryImage.TABLE_NAME,
-                        selection,
-                        selectionArgs
-                    )
-                images[this!!.imagePosition!!].isfav = 0
+                image.isfav=1
+                val fav = FavoritesEntity(savedImageId, image)
+                imagesViewMode.deleteFavorite(fav)
                 btnFav.setImageDrawable(context?.getDrawable(R.drawable.ic_baseline_favorite_border_24))
-                Toast.makeText(context, deletedRows.toString(), Toast.LENGTH_LONG).show()
+                Toast.makeText(context, "Removed", Toast.LENGTH_LONG).show()
             }
+
+
+
+
 
         }
         btnSharewtsp.setOnClickListener {
@@ -154,6 +162,7 @@ class ImgSlider : Fragment(R.layout.fragment_img_slider) {
         btnFav = view.findViewById(R.id.btn_fav)
         btndownload = view.findViewById(R.id.fabDownload)
         viewpager = view.findViewById(R.id.viewpagers)
+
     }
 
     private fun askPermissions() {

@@ -1,8 +1,8 @@
 package com.example.wallsticker.Utilities
 
-import com.example.wallsticker.Model.category
-import com.example.wallsticker.Model.image
-import com.example.wallsticker.Model.quote
+import com.example.wallsticker.Model.Category
+import com.example.wallsticker.Model.Image
+import com.example.wallsticker.Model.Quote
 
 class Const {
 
@@ -18,11 +18,11 @@ class Const {
 
 
         //for images
-        var ImagesTemp = arrayListOf<image>()
-        var ImagesByCatTemp = arrayListOf<image>()
-        var ImageTempFav = arrayListOf<image>()
+        var ImagesTemp = arrayListOf<Image>()
+        var ImagesByCatTemp = arrayListOf<Image>()
+        var ImageTempFav = arrayListOf<Image>()
 
-        var CatImages = arrayListOf<category>()
+        var CatImages = arrayListOf<Category>()
 
 
         var isFavChanged = true
@@ -33,15 +33,19 @@ class Const {
 
         //for quotes
         var quotesarrayof: String = "latest"
-        var quotes = ArrayList<quote>()
+        var quotes = ArrayList<Quote>()
         var QuotesTemp = arrayListOf<Any>()
         var QuotesTempFav = arrayListOf<Any>()
         var QuotesByCat = arrayListOf<Any>()
-        var QuotesCategories = arrayListOf<category>()
+        var QuotesCategories = arrayListOf<Category>()
 
         //Room database
         const val DATABASE_NAME="MY_DB"
         const val TABLE_IMAGE="tbl_images"
+        const val TABLE_FAVORITE = "favorite_tbl"
+        const val TABLE_CATEGORY = "tbl_category"
+
+        const val TABLE_QUOTE="tbl_quote"
     }
 
 

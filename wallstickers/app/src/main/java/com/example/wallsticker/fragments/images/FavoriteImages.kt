@@ -7,28 +7,30 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wallsticker.Adapters.ImagesAdapter
 import com.example.wallsticker.Interfaces.ImageClickListener
-import com.example.wallsticker.Model.category
-import com.example.wallsticker.Model.image
-import com.example.wallsticker.Model.quote
+import com.example.wallsticker.Model.Category
+import com.example.wallsticker.Model.Image
+import com.example.wallsticker.Model.Quote
 import com.example.wallsticker.R
 import com.example.wallsticker.Utilities.Const
 import com.example.wallsticker.Utilities.FeedReaderContract
-import com.example.wallsticker.Utilities.helper
+import com.example.wallsticker.ViewModel.ImagesViewModel
 
 
 class FavoriteImages : Fragment(), ImageClickListener {
 
 
-    private var itemIds: ArrayList<quote>? = null
+    private var itemIds: ArrayList<Quote>? = null
     private lateinit var recyclerView: RecyclerView
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
     private lateinit var nofav: LinearLayout
+    private lateinit var imagesViewMode: ImagesViewModel
 
     val projection = arrayOf(BaseColumns._ID, FeedReaderContract.FeedEntryImage.COLUMN_NAME_IMAGE)
 
@@ -49,53 +51,28 @@ class FavoriteImages : Fragment(), ImageClickListener {
         nofav = view.findViewById(R.id.nofav)
         recyclerView = view.findViewById<RecyclerView>(R.id.fav_images_recycler_view)
         viewManager = GridLayoutManager(activity, 3)
-        viewAdapter = ImagesAdapter(this, Const.ImageTempFav, context)
+        viewAdapter = ImagesAdapter(this, context,Const.ImageTempFav)
         recyclerView.adapter = viewAdapter
         recyclerView.layoutManager = viewManager
         recyclerView.setHasFixedSize(true)
-
-
-
-        getFavImages()
-
-
-    }
-
-
-    private fun getFavImages() {
-        Const.ImageTempFav.clear()
-        val dbHelper = context?.let { helper(it) }
-        val db = dbHelper?.readableDatabase
-        val cursor = db?.query(
-            FeedReaderContract.FeedEntryImage.TABLE_NAME,   // The table to query
-            projection,             // The array of columns to return (pass null to get all)
-            null,              // The columns for the WHERE clause
-            null,          // The values for the WHERE clause
-            null,                   // don't group the rows
-            null,                   // don't filter by row groups
-            null               // The sort order
-        )
-
-        with(cursor) {
-            if (cursor != null) {
-                while (cursor.moveToNext()) {
-                    val itemId = this?.getInt(getColumnIndexOrThrow(BaseColumns._ID))
-                    val image =
-                        this?.getString(getColumnIndexOrThrow(FeedReaderContract.FeedEntryImage.COLUMN_NAME_IMAGE))
-                    val imageOb = image(itemId, image, 0, 0, 1)
-                    Const.ImageTempFav.add(imageOb)
-
+        imagesViewMode=ViewModelProvider(requireActivity()).get(ImagesViewModel::class.java)
+        imagesViewMode.readFavorite.observe(viewLifecycleOwner, { favorites ->
+            Const.ImageTempFav.clear()
+            if (favorites.isEmpty())
+            {
+             nofav.visibility=View.VISIBLE
+            }else{
+                for (fav in favorites) {
+                    fav.image.isfav=1
+                    Const.ImageTempFav.add(fav.image)
                 }
             }
-            if (Const.ImageTempFav.size <= 0)
-                nofav.visibility = View.VISIBLE
-            else nofav.visibility = View.GONE
-        }
-        viewAdapter.notifyDataSetChanged()
-        //Toast.makeText(context, itemIds!!.count().toString(),Toast.LENGTH_LONG).show()
+            viewAdapter.notifyDataSetChanged()
+        })
     }
 
-    override fun onImageClicked(view: View, image: image, pos: Int) {
+
+    override fun onImageClicked(view: View, Image: Image, pos: Int) {
         Const.arrayOf = "fav"
         val action2 =
             ImagesFragmentDirections.actionImagesFragmentToImgSlider(
@@ -104,7 +81,7 @@ class FavoriteImages : Fragment(), ImageClickListener {
         findNavController().navigate(action2)
     }
 
-    override fun onCatClicked(view: View, category: category, pos: Int) {
+    override fun onCatClicked(view: View, category: Category, pos: Int) {
         //don't override this it's for category adapter
     }
 

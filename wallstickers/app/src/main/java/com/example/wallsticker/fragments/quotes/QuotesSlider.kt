@@ -22,7 +22,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.viewpager.widget.ViewPager
 import com.example.wallsticker.Adapters.QuotesSliderAdapter
 import com.example.wallsticker.Interfaces.IncrementServiceQuote
-import com.example.wallsticker.Model.quote
+import com.example.wallsticker.Model.Quote
 import com.example.wallsticker.R
 import com.example.wallsticker.Utilities.Const
 import kotlinx.android.synthetic.main.fragment_quotes_slider.*
@@ -46,7 +46,7 @@ class QuotesSlider : Fragment() {
     private lateinit var navSliderQuotes: LinearLayout
     private lateinit var bottom: LinearLayout
     private var _xDelta = 0
-    private var quote: quote? = null
+    private var quote: Quote? = null
     private var _yDelta = 0
 
     private lateinit var fontsButton: Array<TextView>
@@ -119,10 +119,10 @@ class QuotesSlider : Fragment() {
             }
 
             override fun onPageSelected(position: Int) {
-                if (quotes[position] is quote) {
+                if (quotes[position] is Quote) {
 
                     screenshot = viewpager.findViewWithTag("View" + position)
-                    quote = quotes[position] as quote
+                    quote = quotes[position] as Quote
 
 
                     var incrementView = quote?.count_views?.plus(1)
@@ -303,7 +303,7 @@ class QuotesSlider : Fragment() {
             view.findViewById(R.id.font1) as TextView,
             view.findViewById(R.id.font2) as TextView,
             view.findViewById(R.id.font3) as TextView,
-            view.findViewById(R.id.font4) as TextView,
+            view.findViewById(R.id.font4) as TextView
         )
     }
 

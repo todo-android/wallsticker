@@ -1,7 +1,10 @@
 package com.example.wallsticker.Utilities
 
+import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
 import android.provider.MediaStore
 import java.io.ByteArrayOutputStream
@@ -20,6 +23,8 @@ class Tools {
             )
             return Uri.parse(path)
         }
+
+
     }
 
 

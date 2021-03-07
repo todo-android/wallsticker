@@ -1,26 +1,30 @@
 package com.example.wallsticker.Repository
 
-import android.view.View
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.example.wallsticker.Interfaces.QuotesApi
-import com.example.wallsticker.Model.category
-import com.example.wallsticker.Model.quote
+import com.example.wallsticker.Model.*
 import com.example.wallsticker.Retrofit.RetrofitInstance
-import retrofit2.Call
+import com.example.wallsticker.data.LocalDataSource
+import com.example.wallsticker.data.RemoteDataSource
 
 import retrofit2.Response
+import javax.inject.Inject
 
-class QuotesRepo()  {
+class QuotesRepo @Inject constructor(
+    remoteDataSource: RemoteDataSource,
+    localDataSource: LocalDataSource
+) {
+    val remot=remoteDataSource
+    val local=localDataSource
 
-    //this for categories quotes
-    suspend fun getQuotescategories(): Response<List<category>> {
+
+    //this for categories Images
+    suspend fun getQuotesCategories(): Response<Categories> {
         return  RetrofitInstance.apiQuotes.getQuotesCategories()
     }
 
-    suspend fun getQuotes(offset:Int,id :Int?):Response<List<quote>>{
-        return RetrofitInstance.apiQuotes.getQuotes(offset, id)
-    }
 
+    //this for images
+    suspend fun getQuotes(): Response<Quotes> {
+        return  RetrofitInstance.apiQuotes.getQuotes()
+    }
 
 }

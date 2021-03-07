@@ -6,24 +6,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.example.wallsticker.Adapters.CategoryAdapter
 import com.example.wallsticker.Interfaces.ImageClickListener
-import com.example.wallsticker.Model.category
-import com.example.wallsticker.Model.image
+import com.example.wallsticker.Model.Category
+import com.example.wallsticker.Model.Image
 import com.example.wallsticker.R
 import com.example.wallsticker.Repository.QuotesRepo
 import com.example.wallsticker.Utilities.Const
 import com.example.wallsticker.ViewModel.QuotesViewModel
 import com.example.wallsticker.ViewModelFactory
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class QuotesCategory : Fragment(), ImageClickListener {
 
@@ -75,10 +70,10 @@ class QuotesCategory : Fragment(), ImageClickListener {
         })
     }
 
-    override fun onImageClicked(view: View, image: image, pos: Int) {
+    override fun onImageClicked(view: View, Image: Image, pos: Int) {
     }
 
-    override fun onCatClicked(view: View, category: category, pos: Int) {
+    override fun onCatClicked(view: View, category: Category, pos: Int) {
         val GoToQuotesByCategory =
             HomeQuotesDirections.actionHomeQuotesToQuotesByCategory(category.id)
         findNavController().navigate(GoToQuotesByCategory)
@@ -87,7 +82,7 @@ class QuotesCategory : Fragment(), ImageClickListener {
     private fun initView(view: View){
         refresh = view.findViewById(R.id.refreshLayout)
         recyclerView = view.findViewById<RecyclerView>(R.id.cat_quotes_recycler_view)
-        viewAdapter = CategoryAdapter(Const.QuotesCategories, this)
+        //viewAdapter = CategoryAdapter(Const.QuotesCategories, this)
         viewManager = GridLayoutManager(activity, 1)
         //RecycleView
         recyclerView.adapter = viewAdapter

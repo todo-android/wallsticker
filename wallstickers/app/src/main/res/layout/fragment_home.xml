@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/patrick"
         android:padding="6dp"
-        android:text="Dark Mode"
+        android:text="@string/dark_mode"
         tools:ignore="UseSwitchCompatOrMaterialXml" />
 
     <androidx.cardview.widget.CardView
@@ -46,7 +46,7 @@
                 android:layout_weight="1"
                 android:fontFamily="@font/patrick"
                 android:gravity="center"
-                android:text='"Try not to become a man of success. Rather become a man of value'
+                android:text='@string/default_quote'
                 android:textColor="@color/title"
                 android:textSize="20sp" />
 

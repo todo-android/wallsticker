@@ -18,19 +18,19 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.wallsticker.Adapters.QuotesAdapter
 import com.example.wallsticker.Interfaces.IncrementServiceQuote
 import com.example.wallsticker.Interfaces.QuoteClickListener
-import com.example.wallsticker.Interfaces.QuotesApi
-import com.example.wallsticker.Model.quote
+import com.example.wallsticker.Model.Quote
 import com.example.wallsticker.R
 import com.example.wallsticker.Repository.QuotesRepo
 import com.example.wallsticker.Utilities.*
 import com.example.wallsticker.ViewModel.QuotesViewModel
 import com.example.wallsticker.ViewModelFactory
 import com.facebook.ads.*
+import dagger.hilt.android.AndroidEntryPoint
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-
+@AndroidEntryPoint
 class QuotesLatest : Fragment(), QuoteClickListener {
 
     private lateinit var internetCheck: InternetCheck
@@ -143,7 +143,7 @@ class QuotesLatest : Fragment(), QuoteClickListener {
         })*/
     }
 
-    override fun onQuoteClicked(view: View, quote: quote, pos: Int) {
+    override fun onQuoteClicked(view: View, quote: Quote, pos: Int) {
         Const.INCREMENT_COUNTER++
         if (Const.INCREMENT_COUNTER % Const.COUNTER_AD_SHOW == 0)
             interstitialad.showInter()
@@ -155,7 +155,7 @@ class QuotesLatest : Fragment(), QuoteClickListener {
 
     }
 
-    override fun onShareClicked(quote: quote) {
+    override fun onShareClicked(quote: Quote) {
 
         var packageTxt: String? = ""
         if (Const.enable_share_with_package)
@@ -181,14 +181,14 @@ class QuotesLatest : Fragment(), QuoteClickListener {
             })
     }
 
-    override fun onCopyClicked(view: View, quote: quote) {
+    override fun onCopyClicked(view: View, quote: Quote) {
         val textToCopy = quote.quote
         val clipData = ClipData.newPlainText("text", textToCopy)
         clipboardManager.setPrimaryClip(clipData)
         Toast.makeText(context, "Text copied to clipboard", Toast.LENGTH_LONG).show()
     }
 
-    override fun onFavClicked(quote: quote, pos: Int) {
+    override fun onFavClicked(quote: Quote, pos: Int) {
         Const.isFavChanged = true
         val dbHelper = context?.let { helper(it) }
         val db = dbHelper?.writableDatabase

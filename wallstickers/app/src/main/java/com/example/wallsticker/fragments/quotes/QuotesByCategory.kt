@@ -20,7 +20,7 @@ import com.example.wallsticker.Adapters.QuotesAdapter
 
 import com.example.wallsticker.Interfaces.IncrementServiceQuote
 import com.example.wallsticker.Interfaces.QuoteClickListener
-import com.example.wallsticker.Model.quote
+import com.example.wallsticker.Model.Quote
 import com.example.wallsticker.R
 import com.example.wallsticker.Utilities.*
 import com.facebook.ads.*
@@ -87,7 +87,7 @@ class QuotesByCategory : Fragment(), QuoteClickListener {
         progressBar = view.findViewById(R.id.progress)
     }
 
-    override fun onQuoteClicked(view: View, quote: quote, pos: Int) {
+    override fun onQuoteClicked(view: View, quote: Quote, pos: Int) {
         Const.INCREMENT_COUNTER++
         if (Const.INCREMENT_COUNTER % Const.COUNTER_AD_SHOW == 0)
             interstitialad.showInter()
@@ -98,7 +98,7 @@ class QuotesByCategory : Fragment(), QuoteClickListener {
         }
     }
 
-    override fun onShareClicked(quote: quote) {
+    override fun onShareClicked(quote: Quote) {
         var packageTxt: String? = ""
         if (Const.enable_share_with_package)
             packageTxt =
@@ -123,14 +123,14 @@ class QuotesByCategory : Fragment(), QuoteClickListener {
             })
     }
 
-    override fun onCopyClicked(view: View, quote: quote) {
+    override fun onCopyClicked(view: View, quote: Quote) {
         val textToCopy = quote.quote
         val clipData = ClipData.newPlainText("text", textToCopy)
         clipboardManager.setPrimaryClip(clipData)
         Toast.makeText(context, "Text copied to clipboard", Toast.LENGTH_LONG).show()
     }
 
-    override fun onFavClicked(quote: quote, pos: Int) {
+    override fun onFavClicked(quote: Quote, pos: Int) {
         Const.isFavChanged = true
         val dbHelper = context?.let { helper(it) }
         val db = dbHelper?.writableDatabase

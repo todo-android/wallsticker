@@ -1,8 +1,11 @@
 package com.example.wallsticker.Model
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.android.parcel.Parcelize
 
-data class category(
+@Parcelize
+data class Category(
 
     @SerializedName("id", alternate = ["cid"])
     val id: Int,
@@ -13,4 +16,4 @@ data class category(
 
     val total_wallpaper: String?
 
-)
+): Parcelable

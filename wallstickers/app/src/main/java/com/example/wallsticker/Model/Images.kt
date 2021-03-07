@@ -2,5 +2,6 @@ package com.example.wallsticker.Model
 
 import com.google.gson.annotations.SerializedName
 
-class images(
-    val results :List<image> )
+data class Images(
+    @SerializedName("latest")
+    val results :List<Image> )

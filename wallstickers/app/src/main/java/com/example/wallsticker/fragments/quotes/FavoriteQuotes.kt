@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wallsticker.Adapters.QuotesAdapter
 import com.example.wallsticker.Interfaces.QuoteClickListener
-import com.example.wallsticker.Model.quote
+import com.example.wallsticker.Model.Quote
 import com.example.wallsticker.R
 import com.example.wallsticker.Utilities.Const
 import com.example.wallsticker.Utilities.FeedReaderContract
@@ -27,7 +27,7 @@ import com.example.wallsticker.Utilities.helper
 class FavoriteQuotes : Fragment(), QuoteClickListener {
 
 
-    private var itemIds: ArrayList<quote>? = null
+    private var itemIds: ArrayList<Quote>? = null
     private lateinit var clipboardManager: ClipboardManager
     private lateinit var recyclerView: RecyclerView
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
@@ -68,13 +68,13 @@ class FavoriteQuotes : Fragment(), QuoteClickListener {
     }
 
 
-    override fun onQuoteClicked(view: View, quote: quote, pos: Int) {
+    override fun onQuoteClicked(view: View, quote: Quote, pos: Int) {
         Const.quotesarrayof = "favs"
         val GoToSlider = HomeQuotesDirections.actionHomeQuotesToQuotesSlider(pos)
         findNavController().navigate(GoToSlider)
     }
 
-    override fun onShareClicked(quote: quote) {
+    override fun onShareClicked(quote: Quote) {
         var packageTxt: String? = ""
         if (Const.enable_share_with_package)
             packageTxt =
@@ -87,7 +87,7 @@ class FavoriteQuotes : Fragment(), QuoteClickListener {
         startActivity(Intent.createChooser(shareIntent, "Share To"))
     }
 
-    override fun onCopyClicked(view: View, quote: quote) {
+    override fun onCopyClicked(view: View, quote: Quote) {
         val textToCopy = quote.quote
         val clipData = ClipData.newPlainText("text", textToCopy)
         clipboardManager.setPrimaryClip(clipData)
@@ -115,7 +115,7 @@ class FavoriteQuotes : Fragment(), QuoteClickListener {
                     val itemId = this?.getInt(getColumnIndexOrThrow(BaseColumns._ID))
                     val quoteText =
                         this?.getString(getColumnIndexOrThrow(FeedReaderContract.FeedEntry.COLUMN_NAME_QUOTE))
-                    val quoteOb = quote(itemId, quoteText, 0, 0, 1)
+                    val quoteOb = Quote(itemId, quoteText, 0, 0, 1)
                     Const.QuotesTempFav.add(quoteOb)
 
                 }
@@ -129,7 +129,7 @@ class FavoriteQuotes : Fragment(), QuoteClickListener {
     }
 
 
-    override fun onFavClicked(quote: quote, pos: Int) {
+    override fun onFavClicked(quote: Quote, pos: Int) {
         Const.isFavChanged = true
         val dbHelper = context?.let { helper(it) }
         val db = dbHelper?.writableDatabase

@@ -21,6 +21,8 @@
     <string name="share_text">More => </string>
     <string name="store_prefix">https://play.google.com/store/apps/details?id=</string>
     <string name="permission_required_text">1234</string>
+    <string name="default_quote">Try not to become a man of success. Rather become a man of value</string>
+    <string name="dark_mode">Dark Mode</string>
 
 
 </resources>

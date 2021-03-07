@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
-import com.example.wallsticker.Model.quote
+import com.example.wallsticker.Model.Quote
 import com.example.wallsticker.R
 import com.example.wallsticker.Utilities.AdItem_Fb
 import com.example.wallsticker.Utilities.fbHolder
@@ -38,9 +38,9 @@ class QuotesSliderAdapter(private val context: Context, private var quotes: Arra
 
 
         inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        if (quotes[position] is quote) {
+        if (quotes[position] is Quote) {
             val view = inflater!!.inflate(R.layout.item_quote_slider, null)
-            val quote = quotes[position] as quote
+            val quote = quotes[position] as Quote
             view.txt_quote_slider.text = quote.quote
             val vp = container as ViewPager
             vp.addView(view, 0)

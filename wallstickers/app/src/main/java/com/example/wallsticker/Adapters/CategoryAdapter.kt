@@ -3,20 +3,23 @@ package com.example.wallsticker.Adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.wallsticker.Interfaces.ImageClickListener
-import com.example.wallsticker.Model.category
+import com.example.wallsticker.Model.Categories
+import com.example.wallsticker.Model.Category
 import com.example.wallsticker.R
 import com.example.wallsticker.Utilities.Const
+import com.example.wallsticker.Utilities.ImagesDiffUtil
 import kotlinx.android.synthetic.main.item_category.view.*
 
 class CategoryAdapter(
-    private val Categories: List<category>,
+
     private val onCatClickListener: ImageClickListener
 ) : RecyclerView.Adapter<CategoryAdapter.MyViewHolder>() {
 
-
+    private var Categories = emptyList<Category>()
     class MyViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
 
@@ -48,5 +51,13 @@ class CategoryAdapter(
 
     // Return the size of your dataset (invoked by the layout manager)
     override fun getItemCount() = Categories.size
+
+    fun setData(newData: Categories){
+        val recipesDiffUtil =
+            ImagesDiffUtil(Categories, newData.results)
+        val diffUtilResult = DiffUtil.calculateDiff(recipesDiffUtil)
+        Categories = newData.results
+        diffUtilResult.dispatchUpdatesTo(this)
+    }
 
 }
