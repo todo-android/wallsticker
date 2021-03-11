@@ -1,6 +1,6 @@
 package com.example.wallsticker.di
 
-import com.example.wallsticker.Interfaces.ImagesApi
+import com.example.wallsticker.Interfaces.WallApi
 import com.example.wallsticker.Utilities.Const
 import dagger.Module
 import dagger.Provides
@@ -19,16 +19,16 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideHttpClient():OkHttpClient{
+    fun provideHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
-            .readTimeout(15,TimeUnit.SECONDS)
-            .connectTimeout(15,TimeUnit.SECONDS)
+            .readTimeout(15, TimeUnit.SECONDS)
+            .connectTimeout(15, TimeUnit.SECONDS)
             .build()
     }
 
     @Singleton
     @Provides
-    fun provideConverterFactory():GsonConverterFactory{
+    fun provideConverterFactory(): GsonConverterFactory {
         return GsonConverterFactory.create()
     }
 
@@ -37,7 +37,7 @@ object NetworkModule {
     fun provideRetrofitInstance(
         okHttpClient: OkHttpClient,
         gsonConverterFactory: GsonConverterFactory
-    ):Retrofit{
+    ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(Const.apiurl)
             .client(okHttpClient)
@@ -47,7 +47,7 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideApiService(retrofit: Retrofit):ImagesApi{
-        return retrofit.create(ImagesApi::class.java)
+    fun provideApiService(retrofit: Retrofit): WallApi {
+        return retrofit.create(WallApi::class.java)
     }
 }

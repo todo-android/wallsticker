@@ -9,9 +9,9 @@ data class Image(
     @SerializedName("id")
     val image_id: Int,
     val image_upload: String?,
-    val cat_id:Int,
+    val cat_id: Int,
     val view_count: Int,
     val download_count: Int,
     var isfav: Int?
 
-): Parcelable
+) : Parcelable

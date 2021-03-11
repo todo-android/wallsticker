@@ -8,7 +8,6 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.wallsticker.Repository.DataStoreRepository
 import com.example.wallsticker.Repository.ImagesRepo
-import com.example.wallsticker.data.databsae.entities.FavoritesEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -20,15 +19,12 @@ class MainViewModel @ViewModelInject constructor(
         val name = preferencesKey<String>("mode")
     }
 
-    private val repositoryDataStore= DataStoreRepository(application)
+    private val repositoryDataStore = DataStoreRepository(application)
     val readFromDataStore = repositoryDataStore.readFromDataStore.asLiveData()
 
     fun saveToDataStore(myName: String) = viewModelScope.launch(Dispatchers.IO) {
         repositoryDataStore.saveToDataStore(myName)
     }
-
-
-
 
 
 }

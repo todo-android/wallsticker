@@ -20,7 +20,6 @@ import com.example.wallsticker.Repository.QuotesRepo
 import com.example.wallsticker.Utilities.Const
 import com.example.wallsticker.Utilities.InternetCheck
 import com.example.wallsticker.ViewModel.QuotesViewModel
-import com.example.wallsticker.ViewModelFactory
 import kotlinx.android.synthetic.main.fragment_home.*
 
 
@@ -31,10 +30,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private var trying: Int = 0
     private lateinit var lightMode: Switch
     val styles = arrayOf("Light", "Dark", "System default")
-    var firstcheck :Boolean= false
+    var firstcheck: Boolean = false
     private lateinit var internetCheck: InternetCheck
 
-    private  val mainViewModel: MainViewModel by viewModels()
+    private val mainViewModel: MainViewModel by viewModels()
     private lateinit var viewmodelQuotes: QuotesViewModel
     private lateinit var repository: ImagesRepo
 
@@ -43,35 +42,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val quotesRepo= QuotesRepo()
-        val viewModelFactory= ViewModelFactory(quotesRepo)
 
 
         initView(view)
-        viewmodelQuotes= ViewModelProvider(this,viewModelFactory).get(QuotesViewModel::class.java)
-        //mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-
-        //if (Const.QuotesTemp.size<=0 )
-        //viewmodelQuotes.getLatestQuotes(0,null)
-
-
-
-
-       /* mainViewModel.readFromDataStore.observe(viewLifecycleOwner, { MODE ->
-            when (MODE) {
-                "NO" -> {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                    lightMode.isChecked=false
-                }
-                "YES" -> {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                    lightMode.isChecked=true
-                }
-                else -> {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-                }
-            }
-        })*/
 
 
         btn_Images.setOnClickListener {
@@ -127,7 +100,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         todyaQuote = view.findViewById(R.id.txt_today)
         shareTodayQuote = view.findViewById(R.id.share)
         lightMode = view.findViewById(R.id.modeChange)
-        internetCheck=InternetCheck()
+        internetCheck = InternetCheck()
 
     }
 

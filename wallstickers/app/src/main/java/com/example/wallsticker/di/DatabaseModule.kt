@@ -18,7 +18,7 @@ object DatabaseModule {
 
     @Singleton
     @Provides
-    fun provideDatabase(@ApplicationContext context: Context)= Room.databaseBuilder(
+    fun provideDatabase(@ApplicationContext context: Context) = Room.databaseBuilder(
         context,
         Database::class.java,
         DATABASE_NAME
@@ -26,5 +26,5 @@ object DatabaseModule {
 
     @Singleton
     @Provides
-    fun provideDao(database: Database)=database.imageDao()
+    fun provideDao(database: Database) = database.imageDao()
 }

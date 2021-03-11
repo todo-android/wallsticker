@@ -11,4 +11,4 @@ data class Quote(
     val count_shared: Int?,
     val count_views: Int?,
     var isfav: Int = 0
-): Parcelable
+) : Parcelable

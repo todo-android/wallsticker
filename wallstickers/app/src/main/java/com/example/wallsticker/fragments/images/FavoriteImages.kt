@@ -51,19 +51,18 @@ class FavoriteImages : Fragment(), ImageClickListener {
         nofav = view.findViewById(R.id.nofav)
         recyclerView = view.findViewById<RecyclerView>(R.id.fav_images_recycler_view)
         viewManager = GridLayoutManager(activity, 3)
-        viewAdapter = ImagesAdapter(this, context,Const.ImageTempFav)
+        viewAdapter = ImagesAdapter(this, context, Const.ImageTempFav)
         recyclerView.adapter = viewAdapter
         recyclerView.layoutManager = viewManager
         recyclerView.setHasFixedSize(true)
-        imagesViewMode=ViewModelProvider(requireActivity()).get(ImagesViewModel::class.java)
+        imagesViewMode = ViewModelProvider(requireActivity()).get(ImagesViewModel::class.java)
         imagesViewMode.readFavorite.observe(viewLifecycleOwner, { favorites ->
             Const.ImageTempFav.clear()
-            if (favorites.isEmpty())
-            {
-             nofav.visibility=View.VISIBLE
-            }else{
+            if (favorites.isEmpty()) {
+                nofav.visibility = View.VISIBLE
+            } else {
                 for (fav in favorites) {
-                    fav.image.isfav=1
+                    fav.image.isfav = 1
                     Const.ImageTempFav.add(fav.image)
                 }
             }

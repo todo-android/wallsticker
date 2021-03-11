@@ -13,7 +13,7 @@ class ImageViewModelGetImageByCat @ViewModelInject constructor(
     application: Application,
 ) : AndroidViewModel(application) {
 
-    fun getImageByCat():LiveData<List<ImageEntity>>{
+    fun getImageByCat(): LiveData<List<ImageEntity>> {
         return imageRepo.local.readImageByCategory().asLiveData()
     }
 }

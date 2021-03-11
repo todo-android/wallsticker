@@ -4,4 +4,5 @@ import com.google.gson.annotations.SerializedName
 
 data class Images(
     @SerializedName("latest")
-    val results :List<Image> )
+    val results: List<Image>
+)

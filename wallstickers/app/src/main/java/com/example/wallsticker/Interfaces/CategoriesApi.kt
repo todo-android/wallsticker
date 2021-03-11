@@ -10,7 +10,7 @@ import retrofit2.http.Query
 
 interface QuoteesCategoriesApi {
     @GET("QuotesCats")
-     suspend fun getQuotesCategories(): Response<List<Category>>
+    suspend fun getQuotesCategories(): Response<List<Category>>
 
 
 }

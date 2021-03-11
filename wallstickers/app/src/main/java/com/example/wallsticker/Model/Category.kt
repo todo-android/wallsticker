@@ -16,4 +16,4 @@ data class Category(
 
     val total_wallpaper: String?
 
-): Parcelable
+) : Parcelable

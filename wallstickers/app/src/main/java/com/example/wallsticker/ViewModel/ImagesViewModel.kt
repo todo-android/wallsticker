@@ -4,11 +4,10 @@ import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.widget.Toast
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
-import com.example.wallsticker.Model.Images
 import com.example.wallsticker.Model.Categories
+import com.example.wallsticker.Model.Images
 import com.example.wallsticker.Repository.ImagesRepo
 import com.example.wallsticker.Utilities.NetworkResults
 import com.example.wallsticker.data.databsae.entities.CategoryEntity
@@ -26,7 +25,8 @@ class ImagesViewModel @ViewModelInject constructor(
     /**ROOM DATABASE**/
     val readImages: LiveData<List<ImageEntity>> = imageRepo.local.readdatabase().asLiveData()
     val readFavorite: LiveData<List<FavoritesEntity>> = imageRepo.local.readFavorite().asLiveData()
-    val readCategories :LiveData<List<CategoryEntity>> = imageRepo.local.readCategories().asLiveData()
+    val readCategories: LiveData<List<CategoryEntity>> =
+        imageRepo.local.readCategories().asLiveData()
 
 
     private fun insert(imageEntity: ImageEntity) =
@@ -34,8 +34,8 @@ class ImagesViewModel @ViewModelInject constructor(
             imageRepo.local.insertImage(imageEntity)
         }
 
-    private fun insertCategories(categoryEntity: CategoryEntity)=
-        viewModelScope.launch (Dispatchers.IO){
+    private fun insertCategories(categoryEntity: CategoryEntity) =
+        viewModelScope.launch(Dispatchers.IO) {
             imageRepo.local.insertCategories(categoryEntity)
         }
 
@@ -54,13 +54,13 @@ class ImagesViewModel @ViewModelInject constructor(
     var imagesData: MutableLiveData<NetworkResults<Images>> = MutableLiveData()
 
     fun getImagesCategories() {
-            viewModelScope.launch {
-                getCategoriesSafeCall()
-            }
+        viewModelScope.launch {
+            getCategoriesSafeCall()
+        }
     }
 
     private suspend fun getCategoriesSafeCall() {
-        if  (readCategories.value.isNullOrEmpty()){
+        if (readCategories.value.isNullOrEmpty()) {
             if (hasInternetConnection()) {
                 try {
                     val categoriesResponse = imageRepo.remot.getCategories()
@@ -77,7 +77,6 @@ class ImagesViewModel @ViewModelInject constructor(
 
 
     }
-
 
 
     private fun handCategoriesResponse(categoriesResponse: Response<Categories>): NetworkResults<Categories>? {
@@ -124,7 +123,7 @@ class ImagesViewModel @ViewModelInject constructor(
     }
 
     private fun offlineCacheImages(images: Images) {
-        val imageEntity=ImageEntity(images)
+        val imageEntity = ImageEntity(images)
         insertRecipes(imageEntity)
 
     }

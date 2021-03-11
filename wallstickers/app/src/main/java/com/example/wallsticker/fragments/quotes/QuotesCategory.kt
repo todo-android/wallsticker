@@ -7,18 +7,21 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.example.wallsticker.Adapters.CategoryAdapter
 import com.example.wallsticker.Interfaces.ImageClickListener
 import com.example.wallsticker.Model.Category
 import com.example.wallsticker.Model.Image
 import com.example.wallsticker.R
-import com.example.wallsticker.Repository.QuotesRepo
-import com.example.wallsticker.Utilities.Const
+import com.example.wallsticker.Utilities.Const.Companion.QuotesCategories
+import com.example.wallsticker.Utilities.NetworkResults
 import com.example.wallsticker.ViewModel.QuotesViewModel
-import com.example.wallsticker.ViewModelFactory
+import kotlinx.coroutines.launch
+
 
 class QuotesCategory : Fragment(), ImageClickListener {
 
@@ -26,7 +29,7 @@ class QuotesCategory : Fragment(), ImageClickListener {
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
     private lateinit var refresh: SwipeRefreshLayout
-    private lateinit var viewmodel: QuotesViewModel
+    private lateinit var quotesViewModel: QuotesViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,33 +44,35 @@ class QuotesCategory : Fragment(), ImageClickListener {
         initView(view)
 
 
+        getCategories()
+        quotesViewModel.readCategories.observe(viewLifecycleOwner, { categories ->
+            if (!categories.isNullOrEmpty()) {
+                QuotesCategories.clear()
+                QuotesCategories.addAll(categories[0].Categories.results)
 
-        val quotesRepo=QuotesRepo()
-        val viewModelFactory=ViewModelFactory(quotesRepo)
-        viewmodel=ViewModelProvider(this,viewModelFactory).get(QuotesViewModel::class.java)
+                viewAdapter.notifyDataSetChanged()
 
+                Toast.makeText(context, QuotesCategories.size.toString(), Toast.LENGTH_LONG).show()
+            } else if (categories.isEmpty()) {
+                Toast.makeText(context, "Empty", Toast.LENGTH_LONG).show()
+            }
 
-        refresh.setOnRefreshListener {
-            viewmodel.getQuotesCategories()
-        }
+        })
 
-        if (Const.QuotesCategories.size <= 0) {
-            viewmodel.getQuotesCategories()
-        }
-
-        viewmodel.quotesCategories.observe(viewLifecycleOwner,  { response->
-            if(response.isSuccessful){
-                refresh.isRefreshing=false
-                //Toast.makeText(context, "success", Toast.LENGTH_SHORT).show()
-                response.body()?.let {
-                    Const.QuotesCategories.clear()
-                    Const.QuotesCategories.addAll(it)
-                    viewAdapter.notifyDataSetChanged()
+        quotesViewModel.categoriesNetworkResults.observe(viewLifecycleOwner, { data ->
+            Toast.makeText(context, "observer", Toast.LENGTH_LONG).show()
+            when (data) {
+                is NetworkResults.Success -> {
+                    Toast.makeText(context, "Success", Toast.LENGTH_LONG).show()
                 }
-            }else {
-                Toast.makeText(context, "Please Try Again", Toast.LENGTH_SHORT).show()
+                is NetworkResults.Error -> {
+                    Toast.makeText(context, "Error", Toast.LENGTH_LONG).show()
+                }
+
             }
         })
+
+
     }
 
     override fun onImageClicked(view: View, Image: Image, pos: Int) {
@@ -79,15 +84,22 @@ class QuotesCategory : Fragment(), ImageClickListener {
         findNavController().navigate(GoToQuotesByCategory)
     }
 
-    private fun initView(view: View){
+    private fun initView(view: View) {
         refresh = view.findViewById(R.id.refreshLayout)
         recyclerView = view.findViewById<RecyclerView>(R.id.cat_quotes_recycler_view)
-        //viewAdapter = CategoryAdapter(Const.QuotesCategories, this)
+        viewAdapter = CategoryAdapter(this)
         viewManager = GridLayoutManager(activity, 1)
+        quotesViewModel = ViewModelProvider(requireActivity()).get(QuotesViewModel::class.java)
         //RecycleView
         recyclerView.adapter = viewAdapter
         recyclerView.layoutManager = viewManager
         recyclerView.setHasFixedSize(true)
 
+    }
+
+    private fun getCategories() {
+        lifecycleScope.launch {
+            quotesViewModel.getCategories()
+        }
     }
 }

@@ -20,6 +20,7 @@ class CategoryAdapter(
 ) : RecyclerView.Adapter<CategoryAdapter.MyViewHolder>() {
 
     private var Categories = emptyList<Category>()
+
     class MyViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
 
@@ -52,7 +53,7 @@ class CategoryAdapter(
     // Return the size of your dataset (invoked by the layout manager)
     override fun getItemCount() = Categories.size
 
-    fun setData(newData: Categories){
+    fun setData(newData: Categories) {
         val recipesDiffUtil =
             ImagesDiffUtil(Categories, newData.results)
         val diffUtilResult = DiffUtil.calculateDiff(recipesDiffUtil)

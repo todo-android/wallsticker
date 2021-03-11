@@ -59,7 +59,7 @@ class QuotesByCategory : Fragment(), QuoteClickListener {
         initview(view)
         clipboardManager = context?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         viewManager = GridLayoutManager(activity, 1)
-        layoutManager= LinearLayoutManager(context)
+        layoutManager = LinearLayoutManager(context)
         viewAdapter = QuotesAdapter(this, Const.QuotesByCat, context)
         recyclerView.adapter = viewAdapter
         recyclerView.layoutManager = layoutManager
@@ -157,32 +157,32 @@ class QuotesByCategory : Fragment(), QuoteClickListener {
 
     private fun fetchQuotes() {
 
-       /* QuotesApiByCat().getQuotes(offset, args.catId).enqueue(object : Callback<List<quote>> {
-            override fun onFailure(call: Call<List<quote>>, t: Throwable) {
-                refresh.isRefreshing = false
-                //Toast.makeText(context, t.message, Toast.LENGTH_LONG).show()
-            }
+        /* QuotesApiByCat().getQuotes(offset, args.catId).enqueue(object : Callback<List<quote>> {
+             override fun onFailure(call: Call<List<quote>>, t: Throwable) {
+                 refresh.isRefreshing = false
+                 //Toast.makeText(context, t.message, Toast.LENGTH_LONG).show()
+             }
 
-            override fun onResponse(
-                call: Call<List<quote>>,
-                response: Response<List<quote>>
-            ) {
+             override fun onResponse(
+                 call: Call<List<quote>>,
+                 response: Response<List<quote>>
+             ) {
 
-                refresh.isRefreshing = false
-                val quotes = response.body()
-                quotes?.let {
-                    quotes.forEach {
-                        if (Const.QuotesTempFav.contains(it))
-                            it.id = 1
-                    }
-                    Const.QuotesByCat.addAll(it)
-                    viewAdapter.notifyItemInserted(Const.QuotesByCat.size - 1)
-                    //LoadNativeAd()
-                    progressBar.visibility = View.GONE
-                }
+                 refresh.isRefreshing = false
+                 val quotes = response.body()
+                 quotes?.let {
+                     quotes.forEach {
+                         if (Const.QuotesTempFav.contains(it))
+                             it.id = 1
+                     }
+                     Const.QuotesByCat.addAll(it)
+                     viewAdapter.notifyItemInserted(Const.QuotesByCat.size - 1)
+                     //LoadNativeAd()
+                     progressBar.visibility = View.GONE
+                 }
 
-            }
-        })*/
+             }
+         })*/
     }
 
     //load Native Ad

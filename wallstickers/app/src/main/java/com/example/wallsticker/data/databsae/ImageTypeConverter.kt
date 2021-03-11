@@ -1,9 +1,7 @@
 package com.example.wallsticker.data.databsae
 
 import androidx.room.TypeConverter
-import com.example.wallsticker.Model.Categories
-import com.example.wallsticker.Model.Image
-import com.example.wallsticker.Model.Images
+import com.example.wallsticker.Model.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -43,6 +41,29 @@ class imageTypeConverter {
     @TypeConverter
     fun StringToCategory(data: String): Categories {
         var listType = object : TypeToken<Categories>() {}.type
+        return gson.fromJson(data, listType)
+    }
+
+    @TypeConverter
+    fun QuotesToString(quotes: Quotes): String {
+        return gson.toJson(quotes)
+    }
+
+    @TypeConverter
+    fun StringToQuotes(data: String): Quotes {
+        var listType = object : TypeToken<Quotes>() {}.type
+        return gson.fromJson(data, listType)
+    }
+
+
+    @TypeConverter
+    fun QuoteToString(quote: Quote): String {
+        return gson.toJson(quote)
+    }
+
+    @TypeConverter
+    fun StringToQuote(data: String): Quote {
+        var listType = object : TypeToken<Quote>() {}.type
         return gson.fromJson(data, listType)
     }
 

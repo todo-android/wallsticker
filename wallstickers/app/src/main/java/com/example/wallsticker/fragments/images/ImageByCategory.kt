@@ -8,7 +8,6 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
@@ -21,10 +20,8 @@ import com.example.wallsticker.Model.Category
 import com.example.wallsticker.Model.Image
 import com.example.wallsticker.R
 import com.example.wallsticker.Utilities.Const
-import com.example.wallsticker.ViewModel.ImageViewModelGetImageByCat
 import com.example.wallsticker.ViewModel.ImagesViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ImageByCategory : Fragment(), ImageClickListener {
@@ -104,26 +101,26 @@ class ImageByCategory : Fragment(), ImageClickListener {
     }
 
 
-
     private fun readDatabase() {
 
 
         Toast.makeText(context, args.CatId.toString(), Toast.LENGTH_LONG).show()
-            imagesViewMode.readImages.observe(viewLifecycleOwner, { database ->
-                if (database.isNullOrEmpty()) {
-                    imagesViewMode.getImages()
-                    Toast.makeText(context, "null or empty", Toast.LENGTH_LONG).show()
-                    return@observe
-                } else if (Const.ImagesByCatTemp.isNullOrEmpty()) {
-                    Const.ImagesByCatTemp.clear()
-                    Const.ImagesByCatTemp.addAll(database[0].images.results.shuffled().filter { img->img.cat_id==6 })
-                    Toast.makeText(context,Const.ImagesTemp.size.toString(),Toast.LENGTH_LONG).show()
-                    //
-                    refresh.isRefreshing = false
-                    viewAdapter.notifyDataSetChanged()
-                    //viewAdapter.setData(database[0].images)
-                }
-            })
+        imagesViewMode.readImages.observe(viewLifecycleOwner, { database ->
+            if (database.isNullOrEmpty()) {
+                imagesViewMode.getImages()
+                Toast.makeText(context, "null or empty", Toast.LENGTH_LONG).show()
+                return@observe
+            } else if (Const.ImagesByCatTemp.isNullOrEmpty()) {
+                Const.ImagesByCatTemp.clear()
+                Const.ImagesByCatTemp.addAll(
+                    database[0].images.results.shuffled().filter { img -> img.cat_id == 6 })
+                Toast.makeText(context, Const.ImagesTemp.size.toString(), Toast.LENGTH_LONG).show()
+                //
+                refresh.isRefreshing = false
+                viewAdapter.notifyDataSetChanged()
+                //viewAdapter.setData(database[0].images)
+            }
+        })
 
     }
 

@@ -361,8 +361,8 @@ class QuotesSlider : Fragment() {
         intent.type = "image/png"
         try {
             startActivity(intent)
-        }catch (ex:Exception){
-            Toast.makeText(context,"Error Please Try Again",Toast.LENGTH_LONG).show()
+        } catch (ex: Exception) {
+            Toast.makeText(context, "Error Please Try Again", Toast.LENGTH_LONG).show()
         }
 
         var incrementShare = quote?.count_shared?.plus(1)

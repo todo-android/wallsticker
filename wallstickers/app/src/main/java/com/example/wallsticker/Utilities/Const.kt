@@ -40,12 +40,13 @@ class Const {
         var QuotesCategories = arrayListOf<Category>()
 
         //Room database
-        const val DATABASE_NAME="MY_DB"
-        const val TABLE_IMAGE="tbl_images"
+        const val DATABASE_NAME = "MY_DB"
+        const val TABLE_IMAGE = "tbl_images"
         const val TABLE_FAVORITE = "favorite_tbl"
         const val TABLE_CATEGORY = "tbl_category"
 
-        const val TABLE_QUOTE="tbl_quote"
+        const val TABLE_QUOTE = "tbl_quote"
+        const val TABLE_CATEGOY_QUOTE="tbl_category_quote"
     }
 
 

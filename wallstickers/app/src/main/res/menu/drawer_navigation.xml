@@ -4,14 +4,14 @@
 
     <group>
 
-        <item android:id="@+id/homeQuotes"
+        <item
+            android:id="@+id/homeQuotes"
             android:icon="@drawable/ic_quote"
-            android:title="@string/label_quates"
-            />
-        <item android:id="@+id/ImagesFragment"
+            android:title="@string/label_quates" />
+        <item
+            android:id="@+id/ImagesFragment"
             android:icon="@drawable/ic_image"
-            android:title="@string/label_image"
-            />
+            android:title="@string/label_image" />
     </group>
 
     <item

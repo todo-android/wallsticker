@@ -1,15 +1,12 @@
 package com.example.wallsticker
 
-import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.CompoundButton
 import android.widget.LinearLayout
-import android.widget.Switch
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -43,7 +40,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         drawerLayout = findViewById(R.id.drawerLayout)
-
 
 
         //init facebook audience
@@ -84,10 +80,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setupActionBarWithNavController(navController, appBarConfiguration)
 
 
-
-
-        
-
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -115,7 +107,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        Toast.makeText(applicationContext,item.itemId.toString(),Toast.LENGTH_LONG).show()
+        Toast.makeText(applicationContext, item.itemId.toString(), Toast.LENGTH_LONG).show()
         when (item.itemId) {
             R.id.rate -> {
                 openAppInStore()
@@ -152,7 +144,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val builder = AlertDialog.Builder(this)
         builder.setTitle("chose the")
-        val styles = arrayOf("Light","Dark","System default")
+        val styles = arrayOf("Light", "Dark", "System default")
         val checkedItem = 0
 
         builder.setSingleChoiceItems(styles, checkedItem) { dialog, which ->
