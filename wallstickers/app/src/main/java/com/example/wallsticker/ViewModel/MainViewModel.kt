@@ -20,10 +20,15 @@ class MainViewModel @ViewModelInject constructor(
     }
 
     private val repositoryDataStore = DataStoreRepository(application)
-    val readFromDataStore = repositoryDataStore.readFromDataStore.asLiveData()
+    val readtheme = repositoryDataStore.readtheme.asLiveData()
+    val readRandomQuote = repositoryDataStore.readRandomQuote.asLiveData()
 
     fun saveToDataStore(myName: String) = viewModelScope.launch(Dispatchers.IO) {
-        repositoryDataStore.saveToDataStore(myName)
+        repositoryDataStore.saveTheme(myName)
+    }
+
+    fun saveRandomQuote(quote: String) = viewModelScope.launch(Dispatchers.IO) {
+        repositoryDataStore.saveRandomQuote(quote)
     }
 
 

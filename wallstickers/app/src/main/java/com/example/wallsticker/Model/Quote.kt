@@ -7,6 +7,7 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class Quote(
     var id: Int?,
+    var cid: Int?,
     val quote: String?,
     val count_shared: Int?,
     val count_views: Int?,

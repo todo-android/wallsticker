@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.StrictMode;
-import android.widget.Toast;
 
 import com.example.wallsticker.R;
 import com.koushikdutta.ion.Ion;
@@ -76,7 +75,7 @@ public class ShareTask extends AsyncTask<String, String, String> {
                 dir.mkdirs();
                 String fileName = idStr;
                 file = new File(dir, fileName);
-                Toast.makeText(context, "is Gif", Toast.LENGTH_LONG).show();
+                //Toast.makeText(context, "is Gif", Toast.LENGTH_LONG).show();
                 Ion.with(context.getApplicationContext()).load(path)
                         .write(file);
             } else {

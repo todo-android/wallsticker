@@ -8,24 +8,20 @@ import android.widget.ImageView
 import android.widget.Switch
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.example.wallsticker.ViewModel.MainViewModel
-import com.example.wallsticker.Model.Quote
 import com.example.wallsticker.R
-import com.example.wallsticker.Repository.ImagesRepo
-import com.example.wallsticker.Repository.QuotesRepo
 import com.example.wallsticker.Utilities.Const
 import com.example.wallsticker.Utilities.InternetCheck
-import com.example.wallsticker.ViewModel.QuotesViewModel
+import com.example.wallsticker.ViewModel.MainViewModel
 import kotlinx.android.synthetic.main.fragment_home.*
 
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
     private var offset = 0
-    private lateinit var todyaQuote: TextView
+    private lateinit var randomQuote: TextView
     private lateinit var shareTodayQuote: ImageView
     private var trying: Int = 0
     private lateinit var lightMode: Switch
@@ -33,9 +29,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     var firstcheck: Boolean = false
     private lateinit var internetCheck: InternetCheck
 
-    private val mainViewModel: MainViewModel by viewModels()
-    private lateinit var viewmodelQuotes: QuotesViewModel
-    private lateinit var repository: ImagesRepo
+    private lateinit var mainViewModel: MainViewModel
 
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -45,7 +39,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
 
         initView(view)
-
 
         btn_Images.setOnClickListener {
             val action = HomeFragmentDirections.actionHomeFragmentToLoginFragment()
@@ -69,27 +62,37 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
 
         shareTodayQuote.setOnClickListener {
-
             var packageTxt: String? = ""
             if (Const.enable_share_with_package)
                 packageTxt =
                     "\n" + resources.getString(R.string.share_text) + "\n${resources.getString(R.string.store_prefix) + context?.packageName}"
-
             val shareIntent = Intent()
             shareIntent.action = Intent.ACTION_SEND
             shareIntent.type = "text/plain"
-            shareIntent.putExtra(Intent.EXTRA_TEXT, todyaQuote.text.toString() + packageTxt)
+            shareIntent.putExtra(Intent.EXTRA_TEXT, randomQuote.text.toString() + packageTxt)
             startActivity(Intent.createChooser(shareIntent, "Share To"))
         }
 
 
+        mainViewModel.readtheme.observe(viewLifecycleOwner, { theme ->
+            lightMode.isChecked = theme.contains("YES")
+            if (lightMode.isChecked)
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            else
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        })
 
+        mainViewModel.readRandomQuote.observe(viewLifecycleOwner, { quote ->
+            if (!quote.equals("none"))
+                randomQuote.text = quote.toString()
+
+        })
         lightMode.setOnCheckedChangeListener { buttonview, ischakced ->
             if (ischakced) {
-                //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+
                 mainViewModel.saveToDataStore("YES")
             } else {
-                //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
                 mainViewModel.saveToDataStore("NO")
             }
         }
@@ -97,30 +100,12 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     private fun initView(view: View) {
-        todyaQuote = view.findViewById(R.id.txt_today)
+        randomQuote = view.findViewById(R.id.txt_today)
         shareTodayQuote = view.findViewById(R.id.share)
         lightMode = view.findViewById(R.id.modeChange)
-        internetCheck = InternetCheck()
-
-    }
+        mainViewModel = ViewModelProvider(requireActivity()).get(MainViewModel::class.java)
 
 
-    //set random quote
-    private fun setRandomQuote() {
-
-
-        if (Const.QuotesTemp.size <= 0) {
-        } else {
-            var rnds: Int = (0..Const.QuotesTemp.size - 1).random()
-            if (Const.QuotesTemp[rnds] is Quote) {
-                val quoteString: Quote = Const.QuotesTemp[rnds] as Quote
-                todyaQuote.text = quoteString.quote
-            } else {
-                rnds--
-                val quoteString: Quote = Const.QuotesTemp[rnds] as Quote
-                todyaQuote.text = quoteString.quote
-            }
-        }
     }
 
 

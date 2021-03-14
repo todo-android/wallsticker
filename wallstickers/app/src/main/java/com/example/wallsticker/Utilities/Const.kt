@@ -10,7 +10,7 @@ class Const {
 
         var apiurl = "https://usaapi.dev3pro.co/api/"
         var DELAY_SET_WALLPAPER: Long = 2000
-        var COUNTER_AD_SHOW = 3
+        var COUNTER_AD_SHOW = 6
         var INCREMENT_COUNTER = 0
         val directoryUpload: String = com.example.wallsticker.Config.BASE_URL + "upload/images/"
         val directoryUploadCat: String =
@@ -40,13 +40,17 @@ class Const {
         var QuotesCategories = arrayListOf<Category>()
 
         //Room database
+        //images
         const val DATABASE_NAME = "MY_DB"
         const val TABLE_IMAGE = "tbl_images"
         const val TABLE_FAVORITE = "favorite_tbl"
         const val TABLE_CATEGORY = "tbl_category"
 
+
+        //quotes
         const val TABLE_QUOTE = "tbl_quote"
-        const val TABLE_CATEGOY_QUOTE="tbl_category_quote"
+        const val TABLE_CATEGOY_QUOTE = "tbl_category_quote"
+        const val TABLE_QUOTE_FAVORITE = "favorite_quote_table"
     }
 
 

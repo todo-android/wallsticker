@@ -19,7 +19,8 @@ const val PREFERENCE: String = "My_preference"
 class DataStoreRepository(context: Context) {
 
     private object PreferenceKeys {
-        val name = preferencesKey<String>("mode")
+        val theme = preferencesKey<String>("mode")
+        val quote = preferencesKey<String>("quote")
     }
 
     val dataStore: DataStore<Preferences> = context.createDataStore(
@@ -27,13 +28,19 @@ class DataStoreRepository(context: Context) {
     )
 
 
-    suspend fun saveToDataStore(name: String) {
+    suspend fun saveTheme(name: String) {
         dataStore.edit { preference ->
-            preference[PreferenceKeys.name] = name
+            preference[PreferenceKeys.theme] = name
         }
     }
 
-    val readFromDataStore: Flow<String> = dataStore.data
+    suspend fun saveRandomQuote(quote: String) {
+        dataStore.edit { preference ->
+            preference[PreferenceKeys.quote] = quote
+        }
+    }
+
+    val readRandomQuote: Flow<String> = dataStore.data
         .catch { exception ->
             if (exception is IOException) {
                 Log.d("DataStore", exception.message.toString())
@@ -43,7 +50,21 @@ class DataStoreRepository(context: Context) {
             }
         }
         .map { preference ->
-            val myName = preference[PreferenceKeys.name] ?: "none"
+            val myName = preference[PreferenceKeys.quote] ?: "none"
+            myName
+        }
+
+    val readtheme: Flow<String> = dataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                Log.d("DataStore", exception.message.toString())
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }
+        .map { preference ->
+            val myName = preference[PreferenceKeys.theme] ?: "none"
             myName
         }
 

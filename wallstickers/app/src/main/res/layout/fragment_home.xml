@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/splash_screen"
     android:gravity="center"
     android:orientation="vertical"
     tools:context=".fragments.HomeFragment">
@@ -12,6 +13,7 @@
         android:id="@+id/modeChange"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/backgound"
         android:fontFamily="@font/patrick"
         android:padding="6dp"
         android:text="@string/dark_mode"

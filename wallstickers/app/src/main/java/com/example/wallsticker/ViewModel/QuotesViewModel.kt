@@ -12,8 +12,8 @@ import com.example.wallsticker.Model.Categories
 import com.example.wallsticker.Model.Quotes
 import com.example.wallsticker.Repository.QuotesRepo
 import com.example.wallsticker.Utilities.NetworkResults
-import com.example.wallsticker.data.databsae.entities.FavoritesEntity
 import com.example.wallsticker.data.databsae.entities.QuoteEntity
+import com.example.wallsticker.data.databsae.entities.QuoteFavoritesEntity
 import com.example.wallsticker.data.databsae.entities.QuotesCategoryEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -33,7 +33,8 @@ class QuotesViewModel @ViewModelInject constructor(
 
     /**ROOM DATABASE**/
     var readQuotes: LiveData<List<QuoteEntity>> = quotesRepo.local.readQuotes().asLiveData()
-    var readFavorite: LiveData<List<FavoritesEntity>> = quotesRepo.local.readFavorite().asLiveData()
+    var readFavorite: LiveData<List<QuoteFavoritesEntity>> =
+        quotesRepo.local.readFavoritesQuotes().asLiveData()
     var readCategories: LiveData<List<QuotesCategoryEntity>> =
         quotesRepo.local.readCategoriesQuotes().asLiveData()
 
@@ -90,7 +91,7 @@ class QuotesViewModel @ViewModelInject constructor(
 
     /**get categories from api and cache it**/
     suspend fun getCategories() {
-        if (readCategories.value.isNullOrEmpty()|| readCategories.value!!.size<=0) {
+        if (readCategories.value.isNullOrEmpty() || readCategories.value!!.size <= 0) {
             getcategoriesSafeCall()
         }
     }
@@ -137,6 +138,15 @@ class QuotesViewModel @ViewModelInject constructor(
         Log.d("Tag_quote", "abdou: cache quotes")
         val categoryEntity = QuotesCategoryEntity(0, categories)
         quotesRepo.local.insertCategoriesQuotes(categoryEntity)
+    }
+
+    //read favorites
+    suspend fun insertFavorite(quoteFavoritesEntity: QuoteFavoritesEntity) {
+        quotesRepo.local.insertfavoriteQuote(quoteFavoritesEntity)
+    }
+
+    suspend fun deleteFavorite(quoteFavoritesEntity: QuoteFavoritesEntity) {
+        quotesRepo.local.deletefavoriteQuote(quoteFavoritesEntity)
     }
 
 

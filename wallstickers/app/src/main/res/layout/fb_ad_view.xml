@@ -116,7 +116,7 @@
                 <Button
                     android:id="@+id/native_ad_call_to_action"
                     android:layout_width="100dp"
-                    android:layout_height="30dp"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_weight="1"
                     android:background="@drawable/background"

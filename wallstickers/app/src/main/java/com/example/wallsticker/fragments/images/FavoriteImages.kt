@@ -45,17 +45,8 @@ class FavoriteImages : Fragment(), ImageClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initView(view)
 
-
-
-        nofav = view.findViewById(R.id.nofav)
-        recyclerView = view.findViewById<RecyclerView>(R.id.fav_images_recycler_view)
-        viewManager = GridLayoutManager(activity, 3)
-        viewAdapter = ImagesAdapter(this, context, Const.ImageTempFav)
-        recyclerView.adapter = viewAdapter
-        recyclerView.layoutManager = viewManager
-        recyclerView.setHasFixedSize(true)
-        imagesViewMode = ViewModelProvider(requireActivity()).get(ImagesViewModel::class.java)
         imagesViewMode.readFavorite.observe(viewLifecycleOwner, { favorites ->
             Const.ImageTempFav.clear()
             if (favorites.isEmpty()) {
@@ -65,9 +56,21 @@ class FavoriteImages : Fragment(), ImageClickListener {
                     fav.image.isfav = 1
                     Const.ImageTempFav.add(fav.image)
                 }
+                nofav.visibility = View.GONE
             }
             viewAdapter.notifyDataSetChanged()
         })
+    }
+
+    private fun initView(view: View) {
+        nofav = view.findViewById(R.id.nofav)
+        recyclerView = view.findViewById<RecyclerView>(R.id.fav_images_recycler_view)
+        viewManager = GridLayoutManager(activity, 3)
+        viewAdapter = ImagesAdapter(this, context, Const.ImageTempFav)
+        recyclerView.adapter = viewAdapter
+        recyclerView.layoutManager = viewManager
+        recyclerView.setHasFixedSize(true)
+        imagesViewMode = ViewModelProvider(requireActivity()).get(ImagesViewModel::class.java)
     }
 
 
@@ -83,7 +86,6 @@ class FavoriteImages : Fragment(), ImageClickListener {
     override fun onCatClicked(view: View, category: Category, pos: Int) {
         //don't override this it's for category adapter
     }
-
 
 //    override fun onFavClicked(image: image, pos: Int) {
 //        Const.isFavChanged = true

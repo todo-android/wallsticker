@@ -54,12 +54,24 @@ class LocalDataSource @Inject constructor(
         return WallDao.readQuotes()
     }
 
-    suspend fun insertCategoriesQuotes(categoryEntity: QuotesCategoryEntity){
+    suspend fun insertCategoriesQuotes(categoryEntity: QuotesCategoryEntity) {
         WallDao.insertCategoriesQuotes(categoryEntity)
     }
 
-    fun readCategoriesQuotes():Flow<List<QuotesCategoryEntity>>{
+    fun readCategoriesQuotes(): Flow<List<QuotesCategoryEntity>> {
         return WallDao.readCategoriesQuotes()
+    }
+
+    fun readFavoritesQuotes(): Flow<List<QuoteFavoritesEntity>> {
+        return WallDao.readFavoriteQuotes()
+    }
+
+    suspend fun insertfavoriteQuote(quoteFavoritesEntity: QuoteFavoritesEntity) {
+        WallDao.insertFavoriteQuotes(quoteFavoritesEntity)
+    }
+
+    suspend fun deletefavoriteQuote(quoteFavoritesEntity: QuoteFavoritesEntity) {
+        WallDao.deleteFavoriteQuotes(quoteFavoritesEntity)
     }
 
 

@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.LinearLayout
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -107,7 +106,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        Toast.makeText(applicationContext, item.itemId.toString(), Toast.LENGTH_LONG).show()
+        //Toast.makeText(applicationContext, item.itemId.toString(), Toast.LENGTH_LONG).show()
         when (item.itemId) {
             R.id.rate -> {
                 openAppInStore()

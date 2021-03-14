@@ -48,17 +48,13 @@ interface ImageDao {
     fun readCategoriesQuotes(): Flow<List<QuotesCategoryEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertFavoriteQuotes(favoritesEntity: FavoritesEntity)
+    suspend fun insertFavoriteQuotes(quoteFavoritesEntity: QuoteFavoritesEntity)
 
-    @Query("SELECT * FROM favorite_tbl ORDER BY id ASC")
-    fun readFavoriteQuotes(): Flow<List<FavoritesEntity>>
+    @Query("SELECT * FROM favorite_quote_table")
+    fun readFavoriteQuotes(): Flow<List<QuoteFavoritesEntity>>
 
     @Delete
-    suspend fun deleteFavoriteQuotes(favoritesEntity: FavoritesEntity)
-
-    @Query("SELECT * FROM tbl_images")
-    fun readQuotesByCategory(): Flow<List<ImageEntity>>
-
+    suspend fun deleteFavoriteQuotes(quoteFavoritesEntity: QuoteFavoritesEntity)
 
 
 }

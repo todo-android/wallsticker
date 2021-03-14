@@ -1,12 +1,15 @@
 package com.example.wallsticker.fragments.quotes
 
-import android.content.*
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
-import android.provider.BaseColumns
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -21,8 +24,14 @@ import com.example.wallsticker.Interfaces.IncrementServiceQuote
 import com.example.wallsticker.Interfaces.QuoteClickListener
 import com.example.wallsticker.Model.Quote
 import com.example.wallsticker.R
-import com.example.wallsticker.Utilities.*
+import com.example.wallsticker.Utilities.AdItem_Fb
+import com.example.wallsticker.Utilities.Const
+import com.example.wallsticker.Utilities.Const.Companion.COUNTER_AD_SHOW
+import com.example.wallsticker.Utilities.Const.Companion.QuotesTemp
+import com.example.wallsticker.Utilities.interstitial
+import com.example.wallsticker.ViewModel.MainViewModel
 import com.example.wallsticker.ViewModel.QuotesViewModel
+import com.example.wallsticker.data.databsae.entities.QuoteFavoritesEntity
 import com.facebook.ads.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -42,8 +51,10 @@ class QuotesLatest : Fragment(), QuoteClickListener {
     private lateinit var interstitialad: interstitial
     private lateinit var progressBar: ProgressBar
     private var offset = 0
-
     private lateinit var quotesViewmodel: QuotesViewModel
+    private lateinit var mainViewModel: MainViewModel
+    private lateinit var favButton: ImageView
+    private var firstLoad = true
 
 
     override fun onCreateView(
@@ -67,18 +78,17 @@ class QuotesLatest : Fragment(), QuoteClickListener {
         quotesViewmodel.readQuotes.observe(viewLifecycleOwner, { quotes ->
             if (quotes.isNullOrEmpty()) {
                 //Toast.makeText(context, "Null or empty quotes", Toast.LENGTH_LONG).show()
-            } else {
+                refresh.isRefreshing = true
+            } else if (firstLoad) {
                 Const.QuotesTemp.clear()
                 Const.QuotesTemp.addAll(quotes[0].quotes.results)
+                LoadNativeAd()
                 viewAdapter.notifyDataSetChanged()
-                Toast.makeText(context, Const.QuotesTemp.size.toString(), Toast.LENGTH_LONG).show()
+                setRandomQuote()
+                refresh.isRefreshing = false
+                firstLoad = false
             }
         })
-        quotesViewmodel.quotesNetworkResults.observe(viewLifecycleOwner,{results->
-
-            //Toast.makeText(context,results.message,Toast.LENGTH_LONG).show()
-        })
-
 
         AdSettings.addTestDevice(resources.getString(R.string.addTestDevice))
         interstitialad = context?.let { interstitial(it) }!!
@@ -92,7 +102,7 @@ class QuotesLatest : Fragment(), QuoteClickListener {
         recyclerView = view.findViewById<RecyclerView>(R.id.latest_quote_recycler_view)
         refresh = view.findViewById(R.id.refreshLayout)
         progressBar = view.findViewById(R.id.progress)
-
+        mainViewModel = ViewModelProvider(requireActivity()).get(MainViewModel::class.java)
         quotesViewmodel = ViewModelProvider(requireActivity()).get(QuotesViewModel::class.java)
         viewManager = GridLayoutManager(activity, 1)
         viewAdapter = QuotesAdapter(this, Const.QuotesTemp, context)
@@ -150,51 +160,31 @@ class QuotesLatest : Fragment(), QuoteClickListener {
     }
 
     override fun onFavClicked(quote: Quote, pos: Int) {
-        Const.isFavChanged = true
-        val dbHelper = context?.let { helper(it) }
-        val db = dbHelper?.writableDatabase
-        if (quote.isfav == 0) {
-            val values = ContentValues().apply {
-                put(BaseColumns._ID, quote.id)
-                put(FeedReaderContract.FeedEntry.COLUMN_NAME_QUOTE, quote.quote)
+        lifecycleScope.launch {
+            if (quote.isfav == 0 || quote.isfav == null) {
+                quote.isfav = 1
+                quotesViewmodel.insertFavorite(QuoteFavoritesEntity(quote.id!!, quote))
+            } else {
+                quotesViewmodel.deleteFavorite(QuoteFavoritesEntity(quote.id!!, quote))
+                quote.isfav = 0
             }
-            val newRowId = db!!.insert(FeedReaderContract.FeedEntry.TABLE_NAME, null, values)
-            quote.isfav = 1
-            viewAdapter.notifyItemChanged(pos)
-            //Toast.makeText(context, newRowId.toString(), Toast.LENGTH_LONG).show()
-        } else if (quote.isfav == 1) {
-            val selection = "${BaseColumns._ID} like ?"
-            val selectionArgs = arrayOf(quote.id.toString())
-            val deletedRows =
-                db?.delete(FeedReaderContract.FeedEntry.TABLE_NAME, selection, selectionArgs)
-            quote.isfav = 0
-            viewAdapter.notifyItemChanged(pos)
-            //Toast.makeText(context, deletedRows.toString(), Toast.LENGTH_LONG).show()
         }
+        viewAdapter.notifyItemChanged(pos)
     }
 
     // ad scrolling lister to recycleview
     private fun addScrollerListener() {
         //attaches scrollListener with RecyclerView
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-
-
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-
-
                 if (dy > 0) {
                     if (!recyclerView.canScrollVertically(RecyclerView.FOCUS_DOWN)) {
                         offset += 30
                         progressBar.visibility = View.VISIBLE
-
                     }
                 }
-
-
             }
-
-
         })
     }
 
@@ -253,14 +243,14 @@ class QuotesLatest : Fragment(), QuoteClickListener {
             Log.d("ADNative", "insertAdsInMenuItems: Empty Facebook Native ad")
             return
         }
-        var indexFB = Const.COUNTER_AD_SHOW
+        var indexFB = COUNTER_AD_SHOW
         for (ad in mNativeAds_Fb) {
             //Comment this to close the native Ads
-            if (indexFB > Const.QuotesTemp.size) {
+            if (indexFB > QuotesTemp.size) {
                 break
             }
-            if (Const.QuotesTemp[indexFB] !is AdItem_Fb) {
-                Const.QuotesTemp.add(indexFB, ad)
+            if (QuotesTemp[indexFB] !is AdItem_Fb) {
+                QuotesTemp.add(indexFB, ad)
                 viewAdapter.notifyItemInserted(indexFB)
                 Log.d("ADNative", "insertAdsInMenuItems Facebook|index is :$indexFB")
             }
@@ -268,5 +258,16 @@ class QuotesLatest : Fragment(), QuoteClickListener {
         }
     }
 
+    //set random quote
+    private fun setRandomQuote() {
 
+        if (QuotesTemp.size <= 0) {
+        } else {
+            var rnds: Int = (0..QuotesTemp.size - 1).random()
+            if (QuotesTemp[rnds] is Quote) {
+                val quoteString: Quote = QuotesTemp[rnds] as Quote
+                mainViewModel.saveRandomQuote(quoteString.quote.toString())
+            }
+        }
+    }
 }

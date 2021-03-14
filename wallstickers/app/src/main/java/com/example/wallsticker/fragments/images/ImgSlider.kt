@@ -73,7 +73,7 @@ class ImgSlider : Fragment(R.layout.fragment_img_slider) {
             btnFav.setImageDrawable(context?.getDrawable(R.drawable.ic_is_fav))
         else btnFav.setImageDrawable(context?.getDrawable(R.drawable.ic_baseline_favorite_border_24))
 
-        Toast.makeText(context, image.cat_id.toString(), Toast.LENGTH_LONG).show()
+        //Toast.makeText(context, image.cat_id.toString(), Toast.LENGTH_LONG).show()
 
 
         viewpager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
@@ -104,8 +104,8 @@ class ImgSlider : Fragment(R.layout.fragment_img_slider) {
         btndownload.setOnClickListener {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 askPermissions()
-            }
-            downloadImage(Const.directoryUpload + image.image_upload)
+            } else
+                downloadImage(Const.directoryUpload + image.image_upload)
         }
         btnShare.setOnClickListener {
             ShareTask(context, null).execute(Const.directoryUpload + image.image_upload)
@@ -262,6 +262,7 @@ class ImgSlider : Fragment(R.layout.fragment_img_slider) {
                         ) ==
                                 PackageManager.PERMISSION_GRANTED)
                     ) {
+                        downloadImage(Const.directoryUpload + image.image_upload)
                         Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
                     }
                 } else {

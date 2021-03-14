@@ -7,7 +7,7 @@ import com.example.wallsticker.data.databsae.entities.*
 
 
 @Database(
-    entities = [ImageEntity::class, FavoritesEntity::class, CategoryEntity::class, QuoteEntity::class, QuotesCategoryEntity::class],
+    entities = [ImageEntity::class, FavoritesEntity::class, CategoryEntity::class, QuoteEntity::class, QuotesCategoryEntity::class, QuoteFavoritesEntity::class],
     version = 1,
     exportSchema = false
 )

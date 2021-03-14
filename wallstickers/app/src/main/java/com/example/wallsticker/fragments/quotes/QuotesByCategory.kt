@@ -1,8 +1,10 @@
 package com.example.wallsticker.fragments.quotes
 
-import android.content.*
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
-import android.provider.BaseColumns
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +12,8 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
@@ -17,13 +21,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.wallsticker.Adapters.QuotesAdapter
-
 import com.example.wallsticker.Interfaces.IncrementServiceQuote
 import com.example.wallsticker.Interfaces.QuoteClickListener
 import com.example.wallsticker.Model.Quote
 import com.example.wallsticker.R
-import com.example.wallsticker.Utilities.*
+import com.example.wallsticker.Utilities.AdItem_Fb
+import com.example.wallsticker.Utilities.Const
+import com.example.wallsticker.Utilities.interstitial
+import com.example.wallsticker.ViewModel.QuotesViewModel
+import com.example.wallsticker.data.databsae.entities.QuoteFavoritesEntity
 import com.facebook.ads.*
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -42,6 +50,7 @@ class QuotesByCategory : Fragment(), QuoteClickListener {
     private lateinit var progressBar: ProgressBar
     private lateinit var interstitialad: interstitial
     private lateinit var layoutManager: LinearLayoutManager
+    private lateinit var quotesViewmodel: QuotesViewModel
     private var offset = 0
 
 
@@ -57,23 +66,18 @@ class QuotesByCategory : Fragment(), QuoteClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initview(view)
-        clipboardManager = context?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        viewManager = GridLayoutManager(activity, 1)
-        layoutManager = LinearLayoutManager(context)
-        viewAdapter = QuotesAdapter(this, Const.QuotesByCat, context)
-        recyclerView.adapter = viewAdapter
-        recyclerView.layoutManager = layoutManager
-        recyclerView.setHasFixedSize(true)
-        addScrollerListener()
-
-        refresh.isRefreshing = true
-        Const.QuotesByCat.clear()
-        fetchQuotes()
 
 
-        refresh.setOnRefreshListener {
-            fetchQuotes()
-        }
+        quotesViewmodel.readQuotes.observe(viewLifecycleOwner, { quotes ->
+            if (quotes.isNullOrEmpty()) {
+                Toast.makeText(context, "Null or empty quotes", Toast.LENGTH_LONG).show()
+            } else {
+                Const.QuotesByCat.clear()
+                Const.QuotesByCat.addAll(quotes[0].quotes.results.filter { q -> q.cid == args.catId })
+                viewAdapter.notifyDataSetChanged()
+            }
+        })
+
         AdSettings.addTestDevice(resources.getString(R.string.addTestDevice))
         interstitialad = context?.let { interstitial(it) }!!
         interstitialad.loadInter()
@@ -85,6 +89,14 @@ class QuotesByCategory : Fragment(), QuoteClickListener {
         recyclerView = view.findViewById<RecyclerView>(R.id.bycat_quote_recycler_view)
         refresh = view.findViewById(R.id.refreshLayout)
         progressBar = view.findViewById(R.id.progress)
+        clipboardManager = context?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        viewManager = GridLayoutManager(activity, 1)
+        layoutManager = LinearLayoutManager(context)
+        quotesViewmodel = ViewModelProvider(requireActivity()).get(QuotesViewModel::class.java)
+        viewAdapter = QuotesAdapter(this, Const.QuotesByCat, context)
+        recyclerView.adapter = viewAdapter
+        recyclerView.layoutManager = layoutManager
+        recyclerView.setHasFixedSize(true)
     }
 
     override fun onQuoteClicked(view: View, quote: Quote, pos: Int) {
@@ -131,59 +143,19 @@ class QuotesByCategory : Fragment(), QuoteClickListener {
     }
 
     override fun onFavClicked(quote: Quote, pos: Int) {
-        Const.isFavChanged = true
-        val dbHelper = context?.let { helper(it) }
-        val db = dbHelper?.writableDatabase
-        if (quote.isfav == 0) {
-            val values = ContentValues().apply {
-                put(BaseColumns._ID, quote.id)
-                put(FeedReaderContract.FeedEntry.COLUMN_NAME_QUOTE, quote.quote)
+        lifecycleScope.launch {
+            if (quote.isfav == 0 || quote.isfav == null) {
+                quote.isfav = 1
+                quotesViewmodel.insertFavorite(QuoteFavoritesEntity(quote.id!!, quote))
+
+            } else {
+                quotesViewmodel.deleteFavorite(QuoteFavoritesEntity(quote.id!!, quote))
+                quote.isfav = 0
             }
-            val newRowId = db!!.insert(FeedReaderContract.FeedEntry.TABLE_NAME, null, values)
-            quote.isfav = 1
-            viewAdapter.notifyItemChanged(pos)
-            //Toast.makeText(context, newRowId.toString(), Toast.LENGTH_LONG).show()
-        } else if (quote.isfav == 1) {
-            val selection = "${BaseColumns._ID} like ?"
-            val selectionArgs = arrayOf(quote.id.toString())
-            val deletedRows =
-                db?.delete(FeedReaderContract.FeedEntry.TABLE_NAME, selection, selectionArgs)
-            quote.isfav = 0
-            viewAdapter.notifyItemChanged(pos)
-            //Toast.makeText(context, deletedRows.toString(), Toast.LENGTH_LONG).show()
         }
-
+        viewAdapter.notifyItemChanged(pos)
     }
 
-    private fun fetchQuotes() {
-
-        /* QuotesApiByCat().getQuotes(offset, args.catId).enqueue(object : Callback<List<quote>> {
-             override fun onFailure(call: Call<List<quote>>, t: Throwable) {
-                 refresh.isRefreshing = false
-                 //Toast.makeText(context, t.message, Toast.LENGTH_LONG).show()
-             }
-
-             override fun onResponse(
-                 call: Call<List<quote>>,
-                 response: Response<List<quote>>
-             ) {
-
-                 refresh.isRefreshing = false
-                 val quotes = response.body()
-                 quotes?.let {
-                     quotes.forEach {
-                         if (Const.QuotesTempFav.contains(it))
-                             it.id = 1
-                     }
-                     Const.QuotesByCat.addAll(it)
-                     viewAdapter.notifyItemInserted(Const.QuotesByCat.size - 1)
-                     //LoadNativeAd()
-                     progressBar.visibility = View.GONE
-                 }
-
-             }
-         })*/
-    }
 
     //load Native Ad
     private fun LoadNativeAd() {
@@ -256,29 +228,5 @@ class QuotesByCategory : Fragment(), QuoteClickListener {
         }
     }
 
-
-    private fun addScrollerListener() {
-        //attaches scrollListener with RecyclerView
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-
-
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-
-
-                if (dy > 0) {
-                    if (!recyclerView.canScrollVertically(RecyclerView.FOCUS_DOWN)) {
-                        offset += 30
-                        progressBar.visibility = View.VISIBLE
-                        fetchQuotes()
-                    }
-                }
-
-
-            }
-
-
-        })
-    }
 
 }

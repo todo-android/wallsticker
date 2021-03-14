@@ -83,7 +83,7 @@ class ImgLatestFragment : Fragment(), ImageClickListener {
                     refresh.isRefreshing = false
                 }
                 is NetworkResults.Error -> {
-                    Toast.makeText(context, images.message.toString(), Toast.LENGTH_LONG).show()
+                    //Toast.makeText(context, images.message.toString(), Toast.LENGTH_LONG).show()
                     refresh.isRefreshing = false
                     readDatabase()
                 }
@@ -166,7 +166,7 @@ class ImgLatestFragment : Fragment(), ImageClickListener {
             imagesViewMode.readImages.observe(viewLifecycleOwner, { database ->
                 if (database.isNullOrEmpty()) {
                     imagesViewMode.getImages()
-                    Toast.makeText(context, "null or empty", Toast.LENGTH_LONG).show()
+                    //Toast.makeText(context, "null or empty", Toast.LENGTH_LONG).show()
                 } else if (!isDataLoaded) {
                     Const.ImagesTemp.clear()
                     Const.ImagesTemp.addAll(database[0].images.results.shuffled())

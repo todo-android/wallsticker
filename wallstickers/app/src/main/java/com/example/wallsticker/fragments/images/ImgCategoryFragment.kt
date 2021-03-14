@@ -110,7 +110,7 @@ class ImgCategoryFragment : Fragment(), ImageClickListener {
                 viewAdapter.setData(categories[0].Categories)
                 refresh.isRefreshing = false
             } else
-                Toast.makeText(context, "mdf", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, "Empty Categories", Toast.LENGTH_LONG).show()
         })
     }
 

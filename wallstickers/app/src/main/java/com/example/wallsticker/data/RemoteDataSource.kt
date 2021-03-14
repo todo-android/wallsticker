@@ -23,7 +23,7 @@ class RemoteDataSource @Inject constructor(
         return wallApi.getQuotes()
     }
 
-    suspend fun getCategoriesQuotes():Response<Categories>{
+    suspend fun getCategoriesQuotes(): Response<Categories> {
         return wallApi.getQuotesCategories()
     }
 

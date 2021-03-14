@@ -12,6 +12,8 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -21,7 +23,11 @@ import com.example.wallsticker.Model.Quote
 import com.example.wallsticker.R
 import com.example.wallsticker.Utilities.Const
 import com.example.wallsticker.Utilities.FeedReaderContract
-import com.example.wallsticker.Utilities.helper
+import com.example.wallsticker.ViewModel.QuotesViewModel
+import com.example.wallsticker.data.databsae.entities.QuoteFavoritesEntity
+import kotlinx.coroutines.launch
+
+private lateinit var quotesViewModel: QuotesViewModel
 
 
 class FavoriteQuotes : Fragment(), QuoteClickListener {
@@ -47,22 +53,21 @@ class FavoriteQuotes : Fragment(), QuoteClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-        clipboardManager = context?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-
-        nofav = view.findViewById(R.id.nofav)
-        recyclerView = view.findViewById<RecyclerView>(R.id.fav_quote_recycler_view)
-        viewManager = GridLayoutManager(activity, 1)
-        viewAdapter = QuotesAdapter(this, Const.QuotesTempFav, context)
-        recyclerView.adapter = viewAdapter
-        recyclerView.layoutManager = viewManager
-        recyclerView.setHasFixedSize(true)
-
-
-        if (Const.isFavChanged) {
-            getFavQuotes()
-            Const.isFavChanged = false
-        }
+        initView(view)
+        quotesViewModel.readFavorite.observe(viewLifecycleOwner, { favorites ->
+            if (favorites.isNullOrEmpty()) {
+                nofav.visibility = View.VISIBLE
+                Const.QuotesTempFav.clear()
+            } else {
+                Const.QuotesTempFav.clear()
+                for (fav in favorites) {
+                    fav.quote.isfav = 1
+                    Const.QuotesTempFav.add(fav.quote)
+                }
+                nofav.visibility = View.GONE
+            }
+            viewAdapter.notifyDataSetChanged()
+        })
 
 
     }
@@ -72,6 +77,18 @@ class FavoriteQuotes : Fragment(), QuoteClickListener {
         Const.quotesarrayof = "favs"
         val GoToSlider = HomeQuotesDirections.actionHomeQuotesToQuotesSlider(pos)
         findNavController().navigate(GoToSlider)
+    }
+
+    private fun initView(view: View) {
+        clipboardManager = context?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        nofav = view.findViewById(R.id.nofav)
+        recyclerView = view.findViewById<RecyclerView>(R.id.fav_quote_recycler_view)
+        quotesViewModel = ViewModelProvider(requireActivity()).get(QuotesViewModel::class.java)
+        viewManager = GridLayoutManager(activity, 1)
+        viewAdapter = QuotesAdapter(this, Const.QuotesTempFav, context)
+        recyclerView.adapter = viewAdapter
+        recyclerView.layoutManager = viewManager
+        recyclerView.setHasFixedSize(true)
     }
 
     override fun onShareClicked(quote: Quote) {
@@ -95,54 +112,20 @@ class FavoriteQuotes : Fragment(), QuoteClickListener {
     }
 
 
-    private fun getFavQuotes() {
-        Const.QuotesTempFav.clear()
-        val dbHelper = context?.let { helper(it) }
-        val db = dbHelper?.readableDatabase
-        val cursor = db?.query(
-            FeedReaderContract.FeedEntry.TABLE_NAME,   // The table to query
-            projection,             // The array of columns to return (pass null to get all)
-            null,              // The columns for the WHERE clause
-            null,          // The values for the WHERE clause
-            null,                   // don't group the rows
-            null,                   // don't filter by row groups
-            null               // The sort order
-        )
-
-        with(cursor) {
-            if (cursor != null) {
-                while (cursor.moveToNext()) {
-                    val itemId = this?.getInt(getColumnIndexOrThrow(BaseColumns._ID))
-                    val quoteText =
-                        this?.getString(getColumnIndexOrThrow(FeedReaderContract.FeedEntry.COLUMN_NAME_QUOTE))
-                    val quoteOb = Quote(itemId, quoteText, 0, 0, 1)
-                    Const.QuotesTempFav.add(quoteOb)
-
-                }
-            }
-            if (Const.QuotesTempFav.size <= 0)
-                nofav.visibility = View.VISIBLE
-            else nofav.visibility = View.GONE
-        }
-        viewAdapter.notifyDataSetChanged()
-        //Toast.makeText(context, itemIds!!.count().toString(),Toast.LENGTH_LONG).show()
-    }
-
-
     override fun onFavClicked(quote: Quote, pos: Int) {
-        Const.isFavChanged = true
-        val dbHelper = context?.let { helper(it) }
-        val db = dbHelper?.writableDatabase
-        if (quote.isfav == 1) {
-            val selection = "${BaseColumns._ID} like ?"
-            val selectionArgs = arrayOf(quote.id.toString())
-            val deletedRows =
-                db?.delete(FeedReaderContract.FeedEntry.TABLE_NAME, selection, selectionArgs)
-            quote.isfav = 0
-            Const.QuotesTempFav.remove(quote)
-            viewAdapter.notifyItemRemoved(pos)
-            //Toast.makeText(context, deletedRows.toString(), Toast.LENGTH_LONG).show()
+        lifecycleScope.launch {
+            if (quote.isfav == 0 || quote.isfav == null) {
+                quote.isfav = 1
+                quotesViewModel.insertFavorite(QuoteFavoritesEntity(quote.id!!, quote))
+
+            } else {
+                quotesViewModel.deleteFavorite(QuoteFavoritesEntity(quote.id!!, quote))
+                quote.isfav = 0
+
+            }
+
         }
+        viewAdapter.notifyItemChanged(pos)
 
     }
 }

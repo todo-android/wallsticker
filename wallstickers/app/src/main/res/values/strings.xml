@@ -1,12 +1,14 @@
 <resources>
-    <string name="app_name">wallsticker</string>
+    <string name="app_name">Quotes &amp; Images  2021</string>
 
     <string name="facebook_app_id">727614664650660</string>
 
-    <string name="banner_facebook_id">727614664650660_7276147246506540</string>
-    <string name="native_facebook">727614664650660_7276147146506550</string>
+    <string name="banner_facebook_id">IMG_16_9_APP_INSTALL#YOUR_PLACEMENT_ID</string>
+    <string name="native_facebook">IMG_16_9_APP_INSTALL#YOUR_PLACEMENT_ID</string>
     <string name="interstitial_facebook">727614664650660_7276147113173220</string>
-    <string name="addTestDevice">db9ce886-0640-42c1-9346-a7139b3e077c</string>
+    <string name="addTestDevice">d0267d13-666b-4484-b3c8-b837a79de272</string>
+
+    <string name="email">specialOnesgroup@gmail.com</string>
 
     <string name="label_image">Images</string>
     <string name="label_stickers">All Stickers</string>

@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -104,17 +103,17 @@ class ImageByCategory : Fragment(), ImageClickListener {
     private fun readDatabase() {
 
 
-        Toast.makeText(context, args.CatId.toString(), Toast.LENGTH_LONG).show()
+        //Toast.makeText(context, args.CatId.toString(), Toast.LENGTH_LONG).show()
         imagesViewMode.readImages.observe(viewLifecycleOwner, { database ->
             if (database.isNullOrEmpty()) {
                 imagesViewMode.getImages()
-                Toast.makeText(context, "null or empty", Toast.LENGTH_LONG).show()
+                //Toast.makeText(context, "empty", Toast.LENGTH_LONG).show()
                 return@observe
             } else if (Const.ImagesByCatTemp.isNullOrEmpty()) {
                 Const.ImagesByCatTemp.clear()
                 Const.ImagesByCatTemp.addAll(
                     database[0].images.results.shuffled().filter { img -> img.cat_id == 6 })
-                Toast.makeText(context, Const.ImagesTemp.size.toString(), Toast.LENGTH_LONG).show()
+                //Toast.makeText(context, Const.ImagesTemp.size.toString(), Toast.LENGTH_LONG).show()
                 //
                 refresh.isRefreshing = false
                 viewAdapter.notifyDataSetChanged()
